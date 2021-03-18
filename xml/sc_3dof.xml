@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Robot name="sc_3dof" file="sc_3dof.dae">
+  <Manipulator name="manipulator">
+    <base>Link_0</base>
+    <effector>Link_EE</effector>
+    <direction>0 0 0</direction>
+    <translation>0 0 0</translation>
+  </Manipulator>
+</Robot>

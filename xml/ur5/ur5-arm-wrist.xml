@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Environment>
+  <camtrans>-0.128898 10.983322 0.899461</camtrans>
+  <camrotationaxis>0.000000 0.787037 -1.616906 180.0</camrotationaxis>
+	<Robot name="ur5" file="ur5.dae">
+		<Manipulator name="wrist">
+		  <base>forearm_link</base>
+		  <effector>wrist_3_link</effector>
+		</Manipulator>
+	</Robot>
+</Environment>

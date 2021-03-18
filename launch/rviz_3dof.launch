@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<launch>
+
+  <param name="robot_description" command="$(find xacro)/xacro --inorder '$(find ik_solver_test)/urdf/sc_3dof.xacro'"/>
+
+  <!-- Combine joint values -->
+  <node name="robot_state_publisher" pkg="robot_state_publisher" type="state_publisher"/>
+
+  <!-- Show in Rviz   -->
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(find ik_solver_test)/launch/config/config.rviz"/> <!-- args="-d $(find ik_solver_test)/launch/config.rviz" -->
+
+  <!-- send joint values-->
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher">
+    <param name="use_gui" value="True"/>
+  </node>
+
+  <!-- Can I use TF start like that?
+    <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0 0 0 0.707 0 0 0.707 world leap_hands 100" />-->
+
+</launch>
