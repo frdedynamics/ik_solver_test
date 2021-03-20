@@ -1,52 +1,53 @@
-"""Shows how to get all 6D IK solutions.
-Derived from http://openrave.org/docs/latest_stable/tutorials/openravepy_examples/
-"""
+
 from openravepy import *
+import sys
 import numpy as np
-import time, sys
-# openrave_path = '/home/gizem/Programs/OpenRAVE/repos/openrave/src/data/'
-
+from math import sqrt, pi
 env = Environment() # create the environment
-env.SetViewer('qtcoin') # start the viewer
-# env.Load('../xml/ur5-vertical.xml') # load a scene
+#env.Load('data/lab1.env.xml') # load a scene
+# env.Load('planar_3dof.xml') # load a scene
 env.Load('../xml/ur5-with-objects.xml') # load a scene
+env.SetViewer('qtcoin') # start the viewer
 robot = env.GetRobots()[0] # get the first robot
-print robot.GetActiveDOF()
+print "Dof", robot.GetDOFValues()
 
-with env:
-  ikmodel = databases.inversekinematics.InverseKinematicsModel(robot=robot,iktype=IkParameterization.Type.Translation3D)
-  print "Load:", ikmodel.load()
-  if not ikmodel.load():
-    ikmodel.autogenerate()
-    
-raw_input("Done")
-sys.exit()
-
-
-# manip = robot.SetActiveManipulator('leftarm_torso') # set the manipulator to leftarm
 manip = robot.GetActiveManipulator()
-ikmodel = databases.inversekinematics.InverseKinematicsModel(robot,iktype=IkParameterization.Type.Transform6D)
-
-print "ikmodel file:", ikmodel.getfilename()
-print "ikmodel load:", ikmodel.load()
+Tee = manip.GetEndEffectorTransform() # get end effector
 
 
-raw_input("Done")
+
+# with env:
+  # ikmodel = databases.inversekinematics.InverseKinematicsModel(robot=robot,iktype=IkParameterization.Type.Transform6D)
+  # if not ikmodel.load():
+    # ikmodel.autogenerate()
+  # basemanip = interfaces.BaseManipulation(robot)
+  # taskmanip = interfaces.TaskManipulation(robot)
+  # robot.SetJointValues([-0.97],ikmodel.manip.GetGripperIndices())
+  # robot.SetDOFValues([0.0,0.0,1.57,0.0,0.0,0.0])
+  # Tstart = np.array([[0.0,  0.0007, -0.999999683,  0.496755774],
+ # [ 1.00000000,  0.0,  0.0, -0.743859000],
+ # [ 0.0, -0.999999683, 0.0,  0.554908046],
+ # [ 0.00000000,  0.00000000,  0.00000000,  1.00000000]])
+ 
+with env:
+  ikmodel2 = databases.inversekinematics.InverseKinematicsModel(robot=robot,iktype=IkParameterization.Type.Translation3D)
+  print "Load:", ikmodel2.load()
+  print "Filename:", ikmodel2.getfilename()
+  print "IKname:", ikmodel2.getikname()
+  # print "Joint Names:", ikmodel2.getIndicesFromJointNames("")
+  
+  if not ikmodel2.load():
+    ikmodel2.autogenerate()
+  basemanip = interfaces.BaseManipulation(robot)
+  taskmanip = interfaces.TaskManipulation(robot)
+  robot.SetJointValues([-0.97],ikmodel2.manip.GetGripperIndices())
+  robot.SetDOFValues([0.0,0.0,1.57,0.0,0.0,0.0])
+  Tstart = np.array([[0.0,  0.0007, -0.999999683,  0.496755774],
+ [ 1.00000000,  0.0,  0.0, -0.743859000],
+ [ 0.0, -0.999999683, 0.0,  0.554908046],
+ [ 0.00000000,  0.00000000,  0.00000000,  1.00000000]])
+
+    
+raw_input('Never here')
 sys.exit()
 
-
-if not ikmodel.load():
-    ikmodel.autogenerate()
-    
-
-
-with env: # lock environment
-    Tgoal = np.array([[-1.00, 0.0, 0.0,  0.743], [ 0.0, -0.999, -0.007,  1.127], [ 0.0, -0.007,  0.999, -1.068], [ 0.0,  0.0,  0.0,  1.00]])
-    sol = manip.FindIKSolution(Tgoal, IkFilterOptions.CheckEnvCollisions) # get collision-free solution
-    with robot: # save robot state
-        robot.SetDOFValues(sol,manip.GetArmIndices()) # set the current solution
-        Tee = manip.GetEndEffectorTransform()
-        env.UpdatePublishedBodies() # allow viewer to update new robot
-        time.sleep(10)
-    
-    raveLogInfo('Tee is: '+repr(Tee))
