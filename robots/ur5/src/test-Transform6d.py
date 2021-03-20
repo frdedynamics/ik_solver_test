@@ -13,6 +13,15 @@ env.Load('../xml/ur5-with-objects.xml') # load a scene
 robot = env.GetRobots()[0] # get the first robot
 print robot.GetActiveDOF()
 
+with env:
+  ikmodel = databases.inversekinematics.InverseKinematicsModel(robot=robot,iktype=IkParameterization.Type.Translation3D)
+  print "Load:", ikmodel.load()
+  if not ikmodel.load():
+    ikmodel.autogenerate()
+    
+raw_input("Done")
+sys.exit()
+
 
 # manip = robot.SetActiveManipulator('leftarm_torso') # set the manipulator to leftarm
 manip = robot.GetActiveManipulator()
