@@ -6,15 +6,13 @@ from math import sqrt, pi
 env = Environment() # create the environment
 #env.Load('data/lab1.env.xml') # load a scene
 # env.Load('planar_3dof.xml') # load a scene
-env.Load('ur5-with-objects.xml') # load a scene
+env.Load('../xml/ur5-with-objects.xml') # load a scene
 env.SetViewer('qtcoin') # start the viewer
 robot = env.GetRobots()[0] # get the first robot
 print "Dof", robot.GetDOFValues()
 
 manip = robot.GetActiveManipulator()
 Tee = manip.GetEndEffectorTransform() # get end effector
-
-
 
 
 
