@@ -102,7 +102,7 @@ robot.SetDOFValues(sol2,ikmodel2.manip.GetArmIndices())
 print "Ik solver-2:", sol2
 raw_input("cont3?")
 robot.SetDOFValues(sol3,ikmodel2.manip.GetArmIndices())
-print "Ik solver-2:", sol2
+print "Ik solver-3:", sol3
 # basemanip.MoveToHandPosition([Tee2[0:3,3]],maxiter=1000,maxtries=1,seedik=4)
 # robot.WaitForController(0)
 raw_input("done")
