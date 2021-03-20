@@ -38,10 +38,13 @@ Tee = manip.GetEndEffectorTransform() # get end effector
 
  
 with env:
+  # ikmodel2 = databases.inversekinematics.InverseKinematicsModel(robot=robot,iktype=IkParameterization.Type.Translation3D)
   ikmodel2 = databases.inversekinematics.InverseKinematicsModel(robot=robot,iktype=IkParameterization.Type.Translation3D)
   print "Load:", ikmodel2.load()
   print "Filename:", ikmodel2.getfilename()
   print "IKname:", ikmodel2.getikname()
+  freeparam = manip.GetIkSolver().GetNumFreeParameters()
+  print "IK free param:", freeparam
   # print "Joint Names:", ikmodel2.getIndicesFromJointNames("")
   
   if not ikmodel2.load():
