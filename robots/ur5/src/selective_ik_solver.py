@@ -51,10 +51,13 @@ with env:
   robot.SetJointValues([-0.97],ikmodel2.manip.GetGripperIndices())
   robot.SetDOFValues([0.0,0.0,1.57,0.0,0.0,0.0])
   Tstart = np.array([[0.0,  0.0007, -0.999999683,  0.496755774], [ 1.00000000,  0.0,  0.0, -0.743859000],[ 0.0, -0.999999683, 0.0,  0.554908046], [ 0.00000000,  0.00000000,  0.00000000,  1.00000000]])
+  ikparam = IkParameterization(Tee[0:3,3],ikmodel2.iktype) # build up the translation3d ik query
 # iksolverbase = InterfaceBase.IkSolverBase.Init(robot) I don't know how to use IkSolverBase
 handle = manip.GetIkSolver()
-success = manip.FindIKSolution(manip.GetIkParameterization(IkParameterization.Type.Translation3D),IkFilterOptions.CheckEnvCollisions)
-print "Ik solver:", success # Ik solver: [ 5.55111512e-16 -3.96993549e-12  1.57000000e+00  1.11022302e-16  0.00000000e+00  0.00000000e+00]
+success = manip.FindIKSolution(ikparam,IkFilterOptions.CheckEnvCollisions)
+print "Ik solver:", success # Ik solver: [ 5.55111512e-16 -3.96993549e-12  1.57000000e+00  1.11022302e-16  0.00000000e+00  0.00000000e+00] with manip.GetIkParameterization(IkParameterization.Type.Translation3D)
+print "Ik solver:", success # Ik solver: [ [-1.11022302e-16  8.99614938e-10  1.57000000e+00  1.11022302e-16  0.00000000e+00  0.00000000e+00]] with ikparam
+
 
 
 # print "testing..."
