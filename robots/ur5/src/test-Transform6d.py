@@ -29,42 +29,31 @@ Tee = manip.GetEndEffectorTransform() # get end effector
  # [ 0.0, -0.999999683, 0.0,  0.554908046],
  # [ 0.00000000,  0.00000000,  0.00000000,  1.00000000]])
  
-# with env:
-  # ikmodel2 = databases.inversekinematics.InverseKinematicsModel(robot=robot,iktype=IkParameterization.Type.Translation3D)
-  # print "Load:", ikmodel2.load()
-  # print "Filename:", ikmodel2.getfilename()
-  # print "IKname:", ikmodel2.getikname()
-  # # print "Joint Names:", ikmodel2.getIndicesFromJointNames("")
-  
-  # if not ikmodel2.load():
-    # ikmodel2.autogenerate()
-  # basemanip = interfaces.BaseManipulation(robot)
-  # taskmanip = interfaces.TaskManipulation(robot)
-  # robot.SetJointValues([-0.97],ikmodel2.manip.GetGripperIndices())
-  # robot.SetDOFValues([0.0,0.0,1.57,0.0,0.0,0.0])
-  # Tstart = np.array([[0.0,  0.0007, -0.999999683,  0.496755774],
- # [ 1.00000000,  0.0,  0.0, -0.743859000],
- # [ 0.0, -0.999999683, 0.0,  0.554908046],
- # [ 0.00000000,  0.00000000,  0.00000000,  1.00000000]])
- 
-
 with env:
-  ikmodel3 = databases.inversekinematics.InverseKinematicsModel(robot=robot,iktype=IkParameterization.Type.TranslationXY2D)
-  print "Load:", ikmodel3.load()
-  print "Filename:", ikmodel3.getfilename()
-  print "IKname:", ikmodel3.getikname()
+  ikmodel2 = databases.inversekinematics.InverseKinematicsModel(robot=robot,iktype=IkParameterization.Type.Translation3D)
+  print "Load:", ikmodel2.load()
+  print "Filename:", ikmodel2.getfilename()
+  print "IKname:", ikmodel2.getikname()
   # print "Joint Names:", ikmodel2.getIndicesFromJointNames("")
   
-  if not ikmodel3.load():
-    ikmodel3.autogenerate()
+  if not ikmodel2.load():
+    ikmodel2.autogenerate()
   basemanip = interfaces.BaseManipulation(robot)
   taskmanip = interfaces.TaskManipulation(robot)
-  robot.SetJointValues([-0.97],ikmodel3.manip.GetGripperIndices())
+  robot.SetJointValues([-0.97],ikmodel2.manip.GetGripperIndices())
   robot.SetDOFValues([0.0,0.0,1.57,0.0,0.0,0.0])
-  Tstart = np.array([[0.0,  0.0007, -0.999999683,  0.496755774],
- [ 1.00000000,  0.0,  0.0, -0.743859000],
- [ 0.0, -0.999999683, 0.0,  0.554908046],
- [ 0.00000000,  0.00000000,  0.00000000,  1.00000000]])
+  Tstart = np.array([[0.0,  0.0007, -0.999999683,  0.496755774], [ 1.00000000,  0.0,  0.0, -0.743859000],[ 0.0, -0.999999683, 0.0,  0.554908046], [ 0.00000000,  0.00000000,  0.00000000,  1.00000000]])
+# iksolverbase = InterfaceBase.IkSolverBase.Init(robot) I don't know how to use IkSolverBase
+handle = manip.GetIkSolver()
+success = manip.FindIKSolution(manip.GetIkParameterization(IkParameterization.Type.Translation3D),IkFilterOptions.CheckEnvCollisions)
+print "Ik solver:", success
+
+# print "testing..."
+# successrate, wrongrate = ikmodel2.testik(str(100))
+# print "iktest:", successrate, wrongrate
+ 
+
+
 
     
 raw_input('Never here')
