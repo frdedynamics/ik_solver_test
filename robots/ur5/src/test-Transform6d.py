@@ -18,6 +18,9 @@ Tee = manip.GetEndEffectorTransform() # get end effector
 
 # with env:
   # ikmodel = databases.inversekinematics.InverseKinematicsModel(robot=robot,iktype=IkParameterization.Type.Transform6D)
+  # print "Load:", ikmodel.load()
+  # print "Filename:", ikmodel.getfilename()
+  # print "IKname:", ikmodel.getikname()
   # if not ikmodel.load():
     # ikmodel.autogenerate()
   # basemanip = interfaces.BaseManipulation(robot)
@@ -28,6 +31,11 @@ Tee = manip.GetEndEffectorTransform() # get end effector
  # [ 1.00000000,  0.0,  0.0, -0.743859000],
  # [ 0.0, -0.999999683, 0.0,  0.554908046],
  # [ 0.00000000,  0.00000000,  0.00000000,  1.00000000]])
+  # handle = manip.GetIkSolver()
+  # print "handle:", handle
+  # success = manip.FindIKSolution(Tstart, IkFilterOptions.CheckEnvCollisions)
+  # print "Ik solver:", success # Ik solver: [ 2.26854624e-08  1.35385410e-01  1.48409766e+00  7.36569097e-01 -4.95077482e-04 -7.85605442e-01]
+
  
 with env:
   ikmodel2 = databases.inversekinematics.InverseKinematicsModel(robot=robot,iktype=IkParameterization.Type.Translation3D)
@@ -46,7 +54,8 @@ with env:
 # iksolverbase = InterfaceBase.IkSolverBase.Init(robot) I don't know how to use IkSolverBase
 handle = manip.GetIkSolver()
 success = manip.FindIKSolution(manip.GetIkParameterization(IkParameterization.Type.Translation3D),IkFilterOptions.CheckEnvCollisions)
-print "Ik solver:", success
+print "Ik solver:", success # Ik solver: [ 5.55111512e-16 -3.96993549e-12  1.57000000e+00  1.11022302e-16  0.00000000e+00  0.00000000e+00]
+
 
 # print "testing..."
 # successrate, wrongrate = ikmodel2.testik(str(100))
