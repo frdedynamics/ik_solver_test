@@ -70,10 +70,8 @@ with env:
  # [ 0.00000000e+00  0.00000000e+00  0.00000000e+00  1.00000000e+00]]
 
 
-lower = np.concatenate((np.array([0.0, 0.0, 1.57]), np.array([1., 1., 1.])*-3.14159265))
-upper = np.concatenate((np.array([0.0, 0.0, 1.57]), np.array([1., 1., 1.])*3.14159265))
-# lower = np.ones(robot.GetDOF())*-3.14159265
-# upper = np.ones(robot.GetDOF())*3.14159265
+lower = np.concatenate((np.array([-0.01, -0.01, 1.56]), np.array([1., 1., 1.])*-3.14159265))
+upper = np.concatenate((np.array([0.01, 0.01, 1.58]), np.array([1., 1., 1.])*3.14159265))
 robot.SetDOFLimits(lower, upper)
 print "DOF limits:", robot.GetDOFLimits()
 
