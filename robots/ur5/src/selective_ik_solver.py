@@ -38,14 +38,18 @@ Tee = manip.GetEndEffectorTransform() # get end effector
 
  
 with env:
-  # ikmodel2 = databases.inversekinematics.InverseKinematicsModel(robot=robot,iktype=IkParameterization.Type.Translation3D)
   ikmodel2 = databases.inversekinematics.InverseKinematicsModel(robot=robot,iktype=IkParameterization.Type.Translation3D)
   print "Load:", ikmodel2.load()
   print "Filename:", ikmodel2.getfilename()
   print "IKname:", ikmodel2.getikname()
-  freeparam = manip.GetIkSolver().GetNumFreeParameters()
+  freeparam = manip.GetIkSolver().GetFreeParameters() # from: http://openrave.org/docs/latest_stable/coreapihtml/classOpenRAVE_1_1IkSolverBase.html
   print "IK free param:", freeparam
-  # print "Joint Names:", ikmodel2.getIndicesFromJointNames("")
+  weights = np.array([10.0, 10.0, 10.0, 0.1, 0.1, 0.1])
+  # weights = np.ones(robot.GetDOF())
+  robot.SetDOFWeights(weights)
+  print "DOF weights:", robot.GetDOFWeights()
+  sys.exit()
+
   
   if not ikmodel2.load():
     ikmodel2.autogenerate()
@@ -58,8 +62,8 @@ with env:
 # iksolverbase = InterfaceBase.IkSolverBase.Init(robot) I don't know how to use IkSolverBase
 handle = manip.GetIkSolver()
 success = manip.FindIKSolution(ikparam,IkFilterOptions.CheckEnvCollisions)
-print "Ik solver:", success # Ik solver: [ 5.55111512e-16 -3.96993549e-12  1.57000000e+00  1.11022302e-16  0.00000000e+00  0.00000000e+00] with manip.GetIkParameterization(IkParameterization.Type.Translation3D)
-print "Ik solver:", success # Ik solver: [ [-1.11022302e-16  8.99614938e-10  1.57000000e+00  1.11022302e-16  0.00000000e+00  0.00000000e+00]] with ikparam
+# print "Ik solver:", success # Ik solver: [ 5.55111512e-16 -3.96993549e-12  1.57000000e+00  1.11022302e-16  0.00000000e+00  0.00000000e+00] with manip.GetIkParameterization(IkParameterization.Type.Translation3D)
+# print "Ik solver:", success # Ik solver: [ [-1.11022302e-16  8.99614938e-10  1.57000000e+00  1.11022302e-16  0.00000000e+00  0.00000000e+00]] with ikparam
 
 
 
