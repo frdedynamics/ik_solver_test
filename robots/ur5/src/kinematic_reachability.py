@@ -1,6 +1,7 @@
+#!/usr/bin/env python
 
 from openravepy import *
-import sys
+import sys, os
 import numpy as np
 from math import sqrt, pi
 env = Environment() # create the environment
@@ -39,6 +40,10 @@ upper = np.concatenate((np.array([0.01, 1.58, 1.58]), np.array([1., 1., 1.])*3.1
 robot.SetDOFLimits(lower, upper)
 print "DOF limits:", robot.GetDOFLimits()
 
+# ikreachability = databases.kinematicreachability.ReachabilityModel(robot)
+# filename = RaveFindDatabaseFile('/home/gizem/.openrave/robot.7edbf73fb4fc856e8294d93279d26ff2/reachability.12a06408e3f80af9e5cd98f6fe50e0ba.pp.')
+ikreachability = databases.kinematicreachability.ReachabilityModel(robot=robot)
+ikreachability.show()
 
     
 raw_input('done')
