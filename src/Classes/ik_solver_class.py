@@ -77,8 +77,8 @@ class IKSolver:
 		Tee2 = np.array([[0.00,  0.00,  -1.00,  0.496], [ 1.00,  0.00,  0.00, -0.743], [0.00,  -1.00, 0.00,  0.555], [ 0.00,  0.00,  0.00,  1.00]])
 		Tee3 = np.array([[1.00,  0.00, 0.00,  0.704], [0.00,  1.00, 0.00, -0.836], [0.00,  0.00,  1.00,  0.670], [0.00,  0.00,  0.00,  1.00]])
 		# self.Tee_current = np.array([1.00,  0.00, 0.00,  0.00], [0.00,  1.00, 0.00,  0.00], [0.00,  0.00, 1.00,  0.00], [0.00,  0.00, 0.00,  1.00])
-		self.Tee_current = Tee1 ## for test only
-		self.Tee_goal = np.zeros((4,4), dtype=np.float32)
+		self.Tee_current = Tee1 ## for test only - constantly read by self.manip.GetEndEffectorTransform() # get end effector
+		self.Tee_goal = np.zeros((4,4), dtype=np.float32) # gonna be calculated by ik
 
 
 		# IK parametrization init
@@ -124,12 +124,10 @@ class IKSolver:
 
 
 	def update(self):
-		# self.calculate_joint_angles()
+		self.calculate_joint_angles()
 		# self.joint_states.header.stamp = rospy.Time.now()
 		# self.pub.publish(self.joint_states)
-		test_pub_msg.x = 1.0
-		test_pub_msg.y = 2.0
-		test_pub_msg.z = 3.0
+		self.Tee_current = self.manip.GetEndEffectorTransform()
 		self.Tee_goal_pose = DHmatrices.htm_to_pose(self.Tee_current)
 		self.pub_test.publish(test_pub_msg)
 		self.pub_calculated_tee.publish(self.Tee_goal_pose)
@@ -146,6 +144,8 @@ class IKSolver:
 			self.sol = self.manip.FindIKSolution(self.ikparam, IkFilterOptions.CheckEnvCollisions)
 			self.robot.SetDOFValues(self.sol,self.ikmodel.manip.GetArmIndices())
 			self.joint_states.position = self.robot.GetDOFValues()
+			print "Tee_goal:", self.Tee_goal
+			print "joint positions:", self.joint_states.position
 
 		else:
 			print "Unknown ee_type"
@@ -156,6 +156,7 @@ class IKSolver:
 		Subscribes Tee_pose {Pose()}, converts it to Tee {np.array()}
 		'''
 		Tee_goal_pose = msg
+		print "Tee_goal_pose:", Tee_goal_pose
 		self.Tee_goal = DHmatrices.pose_to_htm(Tee_goal_pose)
 			
 		
