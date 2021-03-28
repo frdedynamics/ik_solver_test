@@ -16,8 +16,12 @@ from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Vector3
 from geometry_msgs.msg import Pose
 
-sys.path.append("/home/gizem/catkin_ws/src/ur5_with_hand_gazebo/src/")
-from Classes.DH_matrices import DHmatrices
+from openravepy import *
+
+sys.path.append("/home/gizem/catkin_ws/src/ur5_with_hand_gazebo/src/Classes")
+from DH_matrices import DHmatrices
+
+sys.exit("Done")
 
 
 _ROSTIME_START = 0
