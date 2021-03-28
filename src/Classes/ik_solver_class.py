@@ -35,63 +35,65 @@ class IKSolver:
 		@params ikmodel: 1->Transform6D 2->Translation3D
 		'''
 
-		# # Set environment and robot state
-		# self.env = Environment()
-		# self.env.Load(robot_path) # load a scene
-		# self.env.SetViewer('qtcoin') # start the viewer
-		# self.robot = self.env.GetRobots()[0] # get the first robot
-		# print "Dof", self.robot.GetDOFValues()
+		# Set environment and robot state
+		self.env = Environment()
+		self.env.Load(robot_path) # load a scene
+		self.env.SetViewer('qtcoin') # start the viewer
+		self.robot = self.env.GetRobots()[0] # get the first robot
+		print "Dof", self.robot.GetDOFValues()
 
-		# # Set IK model
-		# if ikmodel==1:
-			# self.iktype = IkParameterization.Type.Transform6D
-		# elif ikmodel==2:
-			# self.iktype = IkParameterization.Type.Translation3D
-		# else:
-			# sys.exit("IK type not known")
+		# Set IK model
+		if ikmodel==1:
+			self.iktype = IkParameterization.Type.Transform6D
+		elif ikmodel==2:
+			self.iktype = IkParameterization.Type.Translation3D
+		else:
+			sys.exit("IK type not known")
 			
-		# self.ikmodel = databases.inversekinematics.InverseKinematicsModel(robot=self.robot,iktype=self.iktype)
-		# if not self.ikmodel.load():
-			# print "New IK model is creating.."
-			# self.ikmodel.autogenerate()
-			# print "IK model created"
-		# print "Load:", self.ikmodel.load()
-		# print "Filename:", self.ikmodel.getfilename()
-		# print "IKname:", self.ikmodel.getikname()
+		self.ikmodel = databases.inversekinematics.InverseKinematicsModel(robot=self.robot,iktype=self.iktype)
+		if not self.ikmodel.load():
+			print "New IK model is creating.."
+			self.ikmodel.autogenerate()
+			print "IK model created"
+		print "Load:", self.ikmodel.load()
+		print "Filename:", self.ikmodel.getfilename()
+		print "IKname:", self.ikmodel.getikname()
 
-		# # Set active manipulator bases
-		# self.basemanip = interfaces.BaseManipulation(self.robot)
-		# self.taskmanip = interfaces.TaskManipulation(self.robot)
-		# self.manip = self.robot.GetActiveManipulator()
-		# self.Tee = self.manip.GetEndEffectorTransform() # get end effector
+		# Set active manipulator bases
+		self.basemanip = interfaces.BaseManipulation(self.robot)
+		self.taskmanip = interfaces.TaskManipulation(self.robot)
+		self.manip = self.robot.GetActiveManipulator()
+		self.Tee_current = self.manip.GetEndEffectorTransform() # get end effector
 
-		# # Set joint limits
-		# self.robot.SetDOFValues([0.0,-1.57,1.57,0.0,0.0,0.0]) ## you may need to check this values.
-		# lower = np.concatenate((np.array([-0.01, -(pi/2-0.01), pi/2-0.01]), np.array([1., 1., 1.])*-3.14159265))
-		# upper = np.concatenate((np.array([0.01, -(pi/2-0.01), pi/2+0.01]), np.array([1., 1., 1.])*3.14159265))
-		# self.robot.SetDOFLimits(lower, upper)
-		# print "DOF limits:", self.robot.GetDOFLimits()
+		# Set joint limits
+		self.robot.SetDOFValues([0.0,-1.57,1.57,0.0,0.0,0.0]) ## you may need to check this values.
+		lower = np.concatenate((np.array([-0.01, -(pi/2-0.01), pi/2-0.01]), np.array([1., 1., 1.])*-3.14159265))
+		upper = np.concatenate((np.array([0.01, -(pi/2-0.01), pi/2+0.01]), np.array([1., 1., 1.])*3.14159265))
+		self.robot.SetDOFLimits(lower, upper)
+		print "DOF limits:", self.robot.GetDOFLimits()
 
-		# # EE poses
-		# Tee1 = np.array([[0.00,  1.00,  0.00,  1.18], [1.00,  0.00,  0.00, -0.743], [-0.00,  0.00, -1.00,  1.011], [0.00,  0.00,  0.00,  1.00]])
-		# Tee2 = np.array([[0.00,  0.00,  -1.00,  0.496], [ 1.00,  0.00,  0.00, -0.743], [0.00,  -1.00, 0.00,  0.555], [ 0.00,  0.00,  0.00,  1.00]])
-		# Tee3 = np.array([[1.00,  0.00, 0.00,  0.704], [0.00,  1.00, 0.00, -0.836], [0.00,  0.00,  1.00,  0.670], [0.00,  0.00,  0.00,  1.00]])
-		# # self.Tee = np.array([1.00,  0.00, 0.00,  0.00], [0.00,  1.00, 0.00,  0.00], [0.00,  0.00, 1.00,  0.00], [0.00,  0.00, 0.00,  1.00])
-		# self.Tee = Tee1 ## for test only
+		# EE poses
+		Tee1 = np.array([[0.00,  1.00,  0.00,  1.18], [1.00,  0.00,  0.00, -0.743], [-0.00,  0.00, -1.00,  1.011], [0.00,  0.00,  0.00,  1.00]])
+		Tee2 = np.array([[0.00,  0.00,  -1.00,  0.496], [ 1.00,  0.00,  0.00, -0.743], [0.00,  -1.00, 0.00,  0.555], [ 0.00,  0.00,  0.00,  1.00]])
+		Tee3 = np.array([[1.00,  0.00, 0.00,  0.704], [0.00,  1.00, 0.00, -0.836], [0.00,  0.00,  1.00,  0.670], [0.00,  0.00,  0.00,  1.00]])
+		# self.Tee_current = np.array([1.00,  0.00, 0.00,  0.00], [0.00,  1.00, 0.00,  0.00], [0.00,  0.00, 1.00,  0.00], [0.00,  0.00, 0.00,  1.00])
+		self.Tee_current = Tee1 ## for test only
+		self.Tee_goal = np.zeros((4,4), dtype=np.float32)
 
-		# # IK parametrization init
-		# self.ikparam = IkParameterization(self.Tee[0:3,3], self.ikmodel.iktype) # build up the translation3d ik query
-		# self.sol = self.manip.FindIKSolution(self.ikparam, IkFilterOptions.CheckEnvCollisions)
 
-		# # Init robot pose
-		# self.robot.SetDOFValues(self.sol, self.ikmodel.manip.GetArmIndices())
+		# IK parametrization init
+		self.ikparam = IkParameterization(self.Tee_current[0:3,3], self.ikmodel.iktype) # build up the translation3d ik query
+		self.sol = self.manip.FindIKSolution(self.ikparam, IkFilterOptions.CheckEnvCollisions)
 
-		# # Updated parameters
-		# self.joint_states = JointState()
-		# ## TODO: parametrize such that robot.GetJointNames()
-		# self.joint_states.name = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
-		# self.joint_states.position = [0.0, 0.0, pi/2, 0.0, 0.0, 0.0]
-		# self.ee_goal = Vector3()
+		# Init robot pose
+		self.robot.SetDOFValues(self.sol, self.ikmodel.manip.GetArmIndices())
+
+		# Updated parameters
+		self.joint_states = JointState()
+		## TODO: parametrize such that robot.GetJointNames()
+		self.joint_states.name = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
+		self.joint_states.position = [0.0, 0.0, pi/2, 0.0, 0.0, 0.0]
+		self.ee_goal = Vector3()
 		
 		
 		if START_NODE == True:
@@ -112,9 +114,10 @@ class IKSolver:
 	def init_subscribers_and_publishers(self):
 		# self.pub = rospy.Publisher('/joint_states', JointState, queue_size=1) # /ur5_joint_position_cmd
 		self.pub_test = rospy.Publisher('/test_msg', Vector3, queue_size=1) # /ur5_joint_position_cmd
+		self.pub_calculated_tee = rospy.Publisher('/Tee_calculated', Pose, queue_size=1) # /ur5_joint_position_cmd
 		# self.sub_hand_pose = rospy.Subscriber('/hand_pose', Pose, self.sub_hand_pose)
 		# self.sub_wrist_pose = rospy.Subscriber('/wrist_pose', Pose, self.sub_hand_pose)
-		self.sub_Tee_pose = rospy.Subscriber('/Tee_pose', Pose, self.sub_Tee_pose)
+		self.sub_Tee_pose = rospy.Subscriber('/Tee_goal_pose', Pose, self.sub_Tee_pose)
 		# self.log_start_time = rospy.get_time()
 		_ROSTIME_START = rospy.get_time()
 		print "ik_solver_node pub/sub initialized"
@@ -127,7 +130,9 @@ class IKSolver:
 		test_pub_msg.x = 1.0
 		test_pub_msg.y = 2.0
 		test_pub_msg.z = 3.0
+		self.Tee_goal_pose = DHmatrices.htm_to_pose(self.Tee_current)
 		self.pub_test.publish(test_pub_msg)
+		self.pub_calculated_tee.publish(self.Tee_goal_pose)
 			
 
 	def calculate_joint_angles(self):
@@ -135,9 +140,9 @@ class IKSolver:
 		Given ee_goal, calculate joint angles. Do I need to pull ee_goal?
 		@params ee_goal: type np.array(4x4) HTM
 		'''
-		if (type(self.Tee)==np.ndarray) and (self.Tee.shape == (4,4)):
+		if (type(self.Tee_goal)==np.ndarray) and (self.Tee_goal.shape == (4,4)):
 			# self.Tee = Tee
-			self.ikparam = IkParameterization(self.Tee[0:3,3], self.ikmodel.iktype) # build up the translation3d ik query
+			self.ikparam = IkParameterization(self.Tee_goal[0:3,3], self.ikmodel.iktype) # build up the translation3d ik query
 			self.sol = self.manip.FindIKSolution(self.ikparam, IkFilterOptions.CheckEnvCollisions)
 			self.robot.SetDOFValues(self.sol,self.ikmodel.manip.GetArmIndices())
 			self.joint_states.position = self.robot.GetDOFValues()
@@ -150,8 +155,8 @@ class IKSolver:
 		'''
 		Subscribes Tee_pose {Pose()}, converts it to Tee {np.array()}
 		'''
-		Tee_pose = msg
-		self.Tee = DHmatrices.pose_to_htm(Tee_pose)
+		Tee_goal_pose = msg
+		self.Tee_goal = DHmatrices.pose_to_htm(Tee_goal_pose)
 			
 		
 
