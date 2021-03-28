@@ -49,7 +49,7 @@ class IKSolver:
 		else:
 			sys.exit("IK type not known")
 			
-		self.ikmodel = databases.inversekinematics.InverseKinematicsModel(robot=robot,iktype=self.iktype)
+		self.ikmodel = databases.inversekinematics.InverseKinematicsModel(robot=self.robot,iktype=self.iktype)
 		if not self.ikmodel.load():
 			print "New IK model is creating.."
 			self.ikmodel.autogenerate()
@@ -65,11 +65,11 @@ class IKSolver:
 		self.Tee = self.manip.GetEndEffectorTransform() # get end effector
 
 		# Set joint limits
-		robot.SetDOFValues([0.0,-1.57,1.57,0.0,0.0,0.0]) ## you may need to check this values.
+		self.robot.SetDOFValues([0.0,-1.57,1.57,0.0,0.0,0.0]) ## you may need to check this values.
 		lower = np.concatenate((np.array([-0.01, -(pi/2-0.01), pi/2-0.01]), np.array([1., 1., 1.])*-3.14159265))
 		upper = np.concatenate((np.array([0.01, -(pi/2-0.01), pi/2+0.01]), np.array([1., 1., 1.])*3.14159265))
 		self.robot.SetDOFLimits(lower, upper)
-		print "DOF limits:", robot.GetDOFLimits()
+		print "DOF limits:", self.robot.GetDOFLimits()
 
 		# EE poses
 		Tee1 = np.array([[0.00,  1.00,  0.00,  1.18], [1.00,  0.00,  0.00, -0.743], [-0.00,  0.00, -1.00,  1.011], [0.00,  0.00,  0.00,  1.00]])
@@ -92,8 +92,10 @@ class IKSolver:
 		self.joint_states.position = [0.0, 0.0, pi/2, 0.0, 0.0, 0.0]
 		self.ee_goal = Vector3()
 		
+		
 		if START_NODE == True:
 			rospy.init_node("ik_solver_node")
+			self.r = rospy.Rate(rate)
 			print "ik_solver_node initialized"
 
 
@@ -103,7 +105,7 @@ class IKSolver:
 		'''
 		rospy.init_node('ik_solver_node', anonymous=False)
 		print "ik_solver_node initialized"
-		self.r = rospy.Rate(rate)
+		# self.r = rospy.Rate(rate)
 				
 			    
 	def init_subscribers_and_publishers(self):
