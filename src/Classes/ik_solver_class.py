@@ -8,7 +8,7 @@ Subscribes T_goal {Pose()}, publishes joint angles {JointState()}
 # imports
 # import Data.data_logger_module as data_logger
 
-import sys
+import sys, os
 import rospy
 from math import sqrt, pi
 import numpy as np
@@ -19,9 +19,10 @@ from geometry_msgs.msg import Pose
 from openravepy import *
 
 sys.path.append("/home/gizem/catkin_ws/src/ur5_with_hand_gazebo/src/Classes")
+robot_dir = "/home/gizem/catkin_ws/src/ik_solver_test/robots/ur5/xml/"
+robot_name = "ur5-with-objects.xml"
+robot_path = os.path.join(robot_dir, robot_name)
 from DH_matrices import DHmatrices
-
-sys.exit("Done")
 
 
 _ROSTIME_START = 0
@@ -35,7 +36,7 @@ class IKSolver:
 
 		# Set environment and robot state
 		self.env = Environment()
-		self.env.Load('../xml/ur5-with-objects.xml') # load a scene
+		self.env.Load(robot_path) # load a scene
 		self.env.SetViewer('qtcoin') # start the viewer
 		self.robot = self.env.GetRobots()[0] # get the first robot
 		print "Dof", self.robot.GetDOFValues()
