@@ -69,7 +69,7 @@ class IKSolver:
 		self.robot.SetDOFValues([0.0,-1.57,1.57,0.0,0.0,0.0]) ## you may need to check this values.
 		lower = np.concatenate((np.array([-0.01, -(pi/2-0.01), pi/2-0.01]), np.array([1., 1., 1.])*-3.14159265))
 		upper = np.concatenate((np.array([0.01, -(pi/2-0.01), pi/2+0.01]), np.array([1., 1., 1.])*3.14159265))
-		self.robot.SetDOFLimits(lower, upper)
+		# self.robot.SetDOFLimits(lower, upper)
 		print "DOF limits:", self.robot.GetDOFLimits()
 
 		# EE poses
@@ -94,6 +94,8 @@ class IKSolver:
 		self.joint_states.name = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
 		self.joint_states.position = [0.0, 0.0, pi/2, 0.0, 0.0, 0.0]
 		self.ee_goal = Vector3()
+		self.test_joints = JointState()
+		self.test_joints.position = [0.0,-1.57,1.57,0.0,0.0,0.0]
 		
 		
 		if START_NODE == True:
@@ -118,19 +120,25 @@ class IKSolver:
 		# self.sub_hand_pose = rospy.Subscriber('/hand_pose', Pose, self.sub_hand_pose)
 		# self.sub_wrist_pose = rospy.Subscriber('/wrist_pose', Pose, self.sub_hand_pose)
 		self.sub_Tee_pose = rospy.Subscriber('/Tee_goal_pose', Pose, self.sub_Tee_pose)
+		self.sub_test_joint = rospy.Subscriber('/test_joints', JointState, self.sub_test_joint)
 		# self.log_start_time = rospy.get_time()
 		_ROSTIME_START = rospy.get_time()
 		print "ik_solver_node pub/sub initialized"
 
 
 	def update(self):
-		self.calculate_joint_angles()
+		# self.calculate_joint_angles()
 		# self.joint_states.header.stamp = rospy.Time.now()
 		# self.pub.publish(self.joint_states)
 		self.Tee_current = self.manip.GetEndEffectorTransform()
 		self.Tee_goal_pose = DHmatrices.htm_to_pose(self.Tee_current)
 		self.pub_test.publish(test_pub_msg)
 		self.pub_calculated_tee.publish(self.Tee_goal_pose)
+		
+		# self.robot.SetDOFValues(self.test_joints.position) ## you may need to check this values.
+		dummy_input = raw_input("Change dof:")
+		self.robot.SetDOFValues([0.0,1.57,0.0,0.0,0.0,0.0]) ## you may need to check this values.
+		dummy_input = raw_input("Moved?")
 			
 
 	def calculate_joint_angles(self):
@@ -158,6 +166,14 @@ class IKSolver:
 		Tee_goal_pose = msg
 		print "Tee_goal_pose:", Tee_goal_pose
 		self.Tee_goal = DHmatrices.pose_to_htm(Tee_goal_pose)
+		
+		
+	def sub_test_joint(self, msg):
+		'''
+		Subscribes Tee_pose {Pose()}, converts it to Tee {np.array()}
+		'''
+		self.test_joints.position = list(msg.position)
+		print "test_joint_goal:", self.test_joints.position
 			
 		
 
