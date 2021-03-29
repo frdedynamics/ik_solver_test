@@ -65,12 +65,15 @@ class IKSolver:
 		self.taskmanip = interfaces.TaskManipulation(self.robot)
 		self.manip = self.robot.GetActiveManipulator()
 		self.Tee_current = self.manip.GetEndEffectorTransform() # get end effector
+		
+		self.Twrist = self.robot.GetLinks()[2].GetTransform() # get wrist transform
+		self.Twrist_pose = DHmatrices.htm_to_pose(self.Twrist)
 
 		# Set joint limits
 		self.robot.SetDOFValues([0.0,-1.57,1.57,0.0,0.0,0.0]) ## you may need to check this values.
 		lower = np.concatenate((np.array([-0.01, -(pi/2-0.01), pi/2-0.01]), np.array([1., 1., 1.])*-3.14159265))
 		upper = np.concatenate((np.array([0.01, -(pi/2-0.01), pi/2+0.01]), np.array([1., 1., 1.])*3.14159265))
-		self.robot.SetDOFLimits(lower, upper)
+		# self.robot.SetDOFLimits(lower, upper) ## So annoying but skip now
 		print "DOF limits:", self.robot.GetDOFLimits()
 
 		# EE poses
@@ -115,9 +118,9 @@ class IKSolver:
 				
 			    
 	def init_subscribers_and_publishers(self):
-		# self.pub = rospy.Publisher('/joint_states', JointState, queue_size=1) # /ur5_joint_position_cmd
-		self.pub_test = rospy.Publisher('/test_msg', Vector3, queue_size=1) # /ur5_joint_position_cmd
-		self.pub_calculated_tee = rospy.Publisher('/Tee_calculated', Pose, queue_size=1) # /ur5_joint_position_cmd
+		self.pub = rospy.Publisher('/joint_states_openrave', JointState, queue_size=1) 
+		self.pub_calculated_tee = rospy.Publisher('/Tee_calculated', Pose, queue_size=1) 
+		self.pub_Twrist_pose = rospy.Publisher('/Twrist_pose', Pose, queue_size=1)
 		# self.sub_hand_pose = rospy.Subscriber('/hand_pose', Pose, self.sub_hand_pose)
 		# self.sub_wrist_pose = rospy.Subscriber('/wrist_pose', Pose, self.sub_hand_pose)
 		self.sub_Tee_pose = rospy.Subscriber('/Tee_goal_pose', Pose, self.sub_Tee_pose)
@@ -131,17 +134,24 @@ class IKSolver:
 	def update(self):
 		tee_goal = self.Tee_goal
 		self.calculate_joint_angles2(tee_goal)
-		# self.calculate_joint_angles()
-		# self.joint_states.header.stamp = rospy.Time.now()
-		# self.pub.publish(self.joint_states)
+		self.joint_states.header.stamp = rospy.Time.now()
+		self.pub.publish(self.joint_states)
+		
 		self.Tee_current = self.manip.GetEndEffectorTransform()
 		self.Tee_goal_pose = DHmatrices.htm_to_pose(self.Tee_current)
-		self.pub_test.publish(test_pub_msg)
 		self.pub_calculated_tee.publish(self.Tee_goal_pose)
 		
-		print "self.test_joints.position", self.test_joints.position
+		
+		self.Twrist = self.robot.GetLinks()[5].GetTransform() # get wrist transform. The pivot point
+		self.Twrist_pose = DHmatrices.htm_to_pose(self.Twrist)
+		self.pub_Twrist_pose.publish(self.Twrist_pose)
+		
+		## DEBUG purpose only
+		# print "self.test_joints.position", self.test_joints.position
 		# self.robot.SetDOFValues(self.test_joints.position) 
-		print "Tee:", self.Tee_current
+		# print "Tee:", self.Tee_current
+		# print "Twrist_pose:", self.Twrist_pose
+		# print "Tee_pose:", DHmatrices.htm_to_pose(self.Tee_current)
 			
 
 	def calculate_joint_angles(self):
@@ -171,8 +181,8 @@ class IKSolver:
 			self.sol = self.manip.FindIKSolution(self.ikparam, IkFilterOptions.CheckEnvCollisions)
 			self.robot.SetDOFValues(self.sol,self.ikmodel.manip.GetArmIndices())
 			self.joint_states.position = self.robot.GetDOFValues()
-			print "Tee_goal:", tee_goal
-			print "joint positions:", self.joint_states.position
+			# print "Tee_goal:", tee_goal
+			# print "joint positions:", self.joint_states.position
 
 		else:
 			print "Unknown ee_type"
