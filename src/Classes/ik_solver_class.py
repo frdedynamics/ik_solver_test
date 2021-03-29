@@ -70,7 +70,7 @@ class IKSolver:
 		self.robot.SetDOFValues([0.0,-1.57,1.57,0.0,0.0,0.0]) ## you may need to check this values.
 		lower = np.concatenate((np.array([-0.01, -(pi/2-0.01), pi/2-0.01]), np.array([1., 1., 1.])*-3.14159265))
 		upper = np.concatenate((np.array([0.01, -(pi/2-0.01), pi/2+0.01]), np.array([1., 1., 1.])*3.14159265))
-		# self.robot.SetDOFLimits(lower, upper)
+		self.robot.SetDOFLimits(lower, upper)
 		print "DOF limits:", self.robot.GetDOFLimits()
 
 		# EE poses
