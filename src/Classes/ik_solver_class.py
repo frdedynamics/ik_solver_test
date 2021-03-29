@@ -15,6 +15,7 @@ import numpy as np
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Vector3
 from geometry_msgs.msg import Pose
+from std_msgs.msg import Int8
 
 from openravepy import *
 
@@ -69,7 +70,7 @@ class IKSolver:
 		self.robot.SetDOFValues([0.0,-1.57,1.57,0.0,0.0,0.0]) ## you may need to check this values.
 		lower = np.concatenate((np.array([-0.01, -(pi/2-0.01), pi/2-0.01]), np.array([1., 1., 1.])*-3.14159265))
 		upper = np.concatenate((np.array([0.01, -(pi/2-0.01), pi/2+0.01]), np.array([1., 1., 1.])*3.14159265))
-		self.robot.SetDOFLimits(lower, upper)
+		# self.robot.SetDOFLimits(lower, upper)
 		print "DOF limits:", self.robot.GetDOFLimits()
 
 		# EE poses
@@ -121,12 +122,15 @@ class IKSolver:
 		# self.sub_wrist_pose = rospy.Subscriber('/wrist_pose', Pose, self.sub_hand_pose)
 		self.sub_Tee_pose = rospy.Subscriber('/Tee_goal_pose', Pose, self.sub_Tee_pose)
 		self.sub_test_joint = rospy.Subscriber('/test_joints', JointState, self.sub_test_joint)
+		self.sub_selector = rospy.Subscriber('/selector', Int8, self.sub_selector)
 		# self.log_start_time = rospy.get_time()
 		_ROSTIME_START = rospy.get_time()
 		print "ik_solver_node pub/sub initialized"
 
 
 	def update(self):
+		tee_goal = self.Tee_goal
+		self.calculate_joint_angles2(tee_goal)
 		# self.calculate_joint_angles()
 		# self.joint_states.header.stamp = rospy.Time.now()
 		# self.pub.publish(self.joint_states)
@@ -135,8 +139,9 @@ class IKSolver:
 		self.pub_test.publish(test_pub_msg)
 		self.pub_calculated_tee.publish(self.Tee_goal_pose)
 		
-		print "self.test_joints.position", type(self.test_joints.position)
-		self.robot.SetDOFValues(self.test_joints.position) 
+		print "self.test_joints.position", self.test_joints.position
+		# self.robot.SetDOFValues(self.test_joints.position) 
+		print "Tee:", self.Tee_current
 			
 
 	def calculate_joint_angles(self):
@@ -155,7 +160,22 @@ class IKSolver:
 
 		else:
 			print "Unknown ee_type"
+	
+	def calculate_joint_angles2(self, tee_goal):
+		'''
+		Given ee_goal, calculate joint angles. Do I need to pull ee_goal?
+		@params ee_goal: type np.array(4x4) HTM
+		'''
+		if (type(tee_goal)==np.ndarray) and (tee_goal.shape == (4,4)):
+			self.ikparam = IkParameterization(tee_goal[0:3,3], self.ikmodel.iktype) # build up the translation3d ik query
+			self.sol = self.manip.FindIKSolution(self.ikparam, IkFilterOptions.CheckEnvCollisions)
+			self.robot.SetDOFValues(self.sol,self.ikmodel.manip.GetArmIndices())
+			self.joint_states.position = self.robot.GetDOFValues()
+			print "Tee_goal:", tee_goal
+			print "joint positions:", self.joint_states.position
 
+		else:
+			print "Unknown ee_type"
 
 	def sub_Tee_pose(self, msg):
 		'''
@@ -171,6 +191,19 @@ class IKSolver:
 		Subscribes Tee_pose {Pose()}, converts it to Tee {np.array()}
 		'''
 		self.test_joints.position = list(msg.position)
+		
+	def sub_selector(self, msg):
+		'''
+		This is only for test purpose 
+		'''
+		selector = msg.data
+		if selector == 1:
+			self.Tee_goal = np.array([[0.0, 1.0, -0.01, 0.577], [1.0, 0.0, 0.0, -0.743], [0.0, -0.01, -1.0, 1.618], [0.0, 0.0, 0.0, 1.0]])
+		elif selector == 2:
+			self.Tee_goal = np.array([[0.0, 1.0, -0.01, 0.462], [1.0, 0.0, 0.0, -0.743], [0.0, -0.01, -1.0, 1.734], [0.0, 0.0, 0.0, 1.0]])
+		else:
+			print "non registered selection"
+			
 			
 		
 
