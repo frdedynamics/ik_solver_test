@@ -95,7 +95,7 @@ class IKSolver:
 		self.joint_states.position = [0.0, 0.0, pi/2, 0.0, 0.0, 0.0]
 		self.ee_goal = Vector3()
 		self.test_joints = JointState()
-		self.test_joints.position = [0.0,-1.57,1.57,0.0,0.0,0.0]
+		self.test_joints.position = [0.0,1.57,0.0,0.0,0.0,0.0]
 		
 		
 		if START_NODE == True:
@@ -136,9 +136,13 @@ class IKSolver:
 		self.pub_calculated_tee.publish(self.Tee_goal_pose)
 		
 		# self.robot.SetDOFValues(self.test_joints.position) ## you may need to check this values.
-		dummy_input = raw_input("Change dof:")
-		self.robot.SetDOFValues([0.0,1.57,0.0,0.0,0.0,0.0]) ## you may need to check this values.
-		dummy_input = raw_input("Moved?")
+		print "self.test_joints.position", type(self.test_joints.position)
+		# self.test_joints.position = [0.0,1.57,0.0,0.0,0.0,0.0]
+		# dummy_input = raw_input("Change dof:")
+		self.robot.SetDOFValues(self.test_joints.position) ## you may need to check this values.
+		# dummy_input = raw_input("Moved?")
+		# self.test_joints.position = [-1.57,1.57,0.0,0.0,0.0,0.0]
+		# self.robot.SetDOFValues(self.test_joints.position) ## you may need to check this values.
 			
 
 	def calculate_joint_angles(self):
@@ -173,7 +177,7 @@ class IKSolver:
 		Subscribes Tee_pose {Pose()}, converts it to Tee {np.array()}
 		'''
 		self.test_joints.position = list(msg.position)
-		print "test_joint_goal:", self.test_joints.position
+		# print "test_joint_goal:", self.test_joints.position
 			
 		
 
