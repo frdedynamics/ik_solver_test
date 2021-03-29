@@ -69,7 +69,7 @@ class IKSolver:
 		self.robot.SetDOFValues([0.0,-1.57,1.57,0.0,0.0,0.0]) ## you may need to check this values.
 		lower = np.concatenate((np.array([-0.01, -(pi/2-0.01), pi/2-0.01]), np.array([1., 1., 1.])*-3.14159265))
 		upper = np.concatenate((np.array([0.01, -(pi/2-0.01), pi/2+0.01]), np.array([1., 1., 1.])*3.14159265))
-		# self.robot.SetDOFLimits(lower, upper)
+		self.robot.SetDOFLimits(lower, upper)
 		print "DOF limits:", self.robot.GetDOFLimits()
 
 		# EE poses
@@ -135,14 +135,8 @@ class IKSolver:
 		self.pub_test.publish(test_pub_msg)
 		self.pub_calculated_tee.publish(self.Tee_goal_pose)
 		
-		# self.robot.SetDOFValues(self.test_joints.position) ## you may need to check this values.
 		print "self.test_joints.position", type(self.test_joints.position)
-		# self.test_joints.position = [0.0,1.57,0.0,0.0,0.0,0.0]
-		# dummy_input = raw_input("Change dof:")
-		self.robot.SetDOFValues(self.test_joints.position) ## you may need to check this values.
-		# dummy_input = raw_input("Moved?")
-		# self.test_joints.position = [-1.57,1.57,0.0,0.0,0.0,0.0]
-		# self.robot.SetDOFValues(self.test_joints.position) ## you may need to check this values.
+		self.robot.SetDOFValues(self.test_joints.position) 
 			
 
 	def calculate_joint_angles(self):
@@ -177,7 +171,6 @@ class IKSolver:
 		Subscribes Tee_pose {Pose()}, converts it to Tee {np.array()}
 		'''
 		self.test_joints.position = list(msg.position)
-		# print "test_joint_goal:", self.test_joints.position
 			
 		
 
