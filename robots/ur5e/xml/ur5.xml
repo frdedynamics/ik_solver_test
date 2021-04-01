@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Robot name="ur5" file="../models/ur5.dae">
+  <Manipulator name="manipulator">
+    <base>base_link</base>
+    <effector>ee_link</effector>
+    <direction>0 0 0</direction>
+    <translation>0 0 0</translation>
+  </Manipulator>
+</Robot>

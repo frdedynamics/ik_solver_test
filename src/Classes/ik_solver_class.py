@@ -66,7 +66,7 @@ class IKSolver:
 		self.manip = self.robot.GetActiveManipulator()
 		self.Tee_current = self.manip.GetEndEffectorTransform() # get end effector
 		
-		self.Twrist = self.robot.GetLinks()[2].GetTransform() # get wrist transform
+		self.Twrist = self.robot.GetLinks()[5].GetTransform() # get wrist transform
 		self.Twrist_pose = DHmatrices.htm_to_pose(self.Twrist)
 
 		# Set joint limits
@@ -135,6 +135,7 @@ class IKSolver:
 		tee_goal = self.Tee_goal
 		self.calculate_joint_angles2(tee_goal)
 		self.joint_states.header.stamp = rospy.Time.now()
+		self.joint_states.position = self.robot.GetDOFValues()
 		self.pub.publish(self.joint_states)
 		
 		self.Tee_current = self.manip.GetEndEffectorTransform()

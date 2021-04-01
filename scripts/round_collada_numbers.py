@@ -52,7 +52,7 @@ def doRound(values,decimal_places):
 
     for num in num_vector:
         new_num = round(float(num),decimal_places)
-        print "Old:",num,"New:",new_num
+        # print "Old:",num,"New:",new_num
         new_vector.append(str(new_num))
 
     new = " ".join(new_vector)
