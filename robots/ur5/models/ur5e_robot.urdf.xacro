@@ -6,7 +6,7 @@
   <xacro:include filename="$(find ur_e_description)/urdf/common.gazebo.xacro" />
 
   <!-- ur5e -->
-  <xacro:include filename="$(find ur_e_description)/urdf/ur5e.urdf.xacro" />
+  <xacro:include filename="$(find ik_solver_test)/robots/models/ur5e.urdf.xacro" />
 
   <!-- arm -->
   <xacro:arg name="kinematics_config" default="$(find ur_e_description)/config/ur5e_default.yaml"/>

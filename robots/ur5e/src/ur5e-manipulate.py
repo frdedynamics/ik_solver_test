@@ -1,7 +1,12 @@
 
 from openravepy import *
 import sys
-import numpy
+import numpy as np
+
+sys.path.append("/home/gizem/catkin_ws/src/ur5_with_hand_gazebo/src/Classes")
+from DH_matrices import DHmatrices
+
+
 env = Environment() # create the environment
 #env.Load('data/lab1.env.xml') # load a scene
 # env.Load('planar_3dof.xml') # load a scene
@@ -11,15 +16,29 @@ robot = env.GetRobots()[0] # get the first robot
 print "Dof", robot.GetDOFValues()
 
 
-robot.SetDOFValues([0.0, 0.0, 1.57, 0.0, 0.0, 0.0])
+robot.SetDOFValues([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+dummy_input = raw_input("Change joints")
+
+robot.SetDOFValues([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+
+manip = robot.GetActiveManipulator()
+Tee = manip.GetEndEffectorTransform() # get end effector
+Tee_pose = DHmatrices.htm_to_pose(Tee)
+print "Tee_pose:", Tee_pose
+dummy_input = raw_input("Done?")
 
 
 ikmodel=databases.inversekinematics.InverseKinematicsModel(robot,iktype=IkParameterization.Type.Transform6D)
 if not ikmodel.load():
+    print "new ik model loading"
     ikmodel.autogenerate()
-    
-print ikmodel.load()
 
+print ikmodel.load()
+dummy_input = raw_input("Change joints")
+
+robot.SetDOFValues([1.57, 0.0, 1.57, 0.0, 0.0, 0.0])
+dummy_input = raw_input("Done?")
+sys.exit()
 
 
 
@@ -68,7 +87,7 @@ ikmodel2=databases.inversekinematics.InverseKinematicsModel(robot,iktype=IkParam
 if not ikmodel2.load():
 	print "IK autogenerate"
 	ikmodel2.autogenerate()
-    
+
 print ikmodel2.load()
 
 print "Thand:", Thand[0:3,3]
@@ -102,7 +121,3 @@ robot.WaitForController(0) # wait
 
 raw_input('Hit ENTER to continue.')
 env.Destroy()
-
-
-
-
