@@ -73,7 +73,7 @@ class IKSolver:
 		self.Twrist_pose = DHmatrices.htm_to_pose(self.Twrist)
 
 		# Set joint limits
-		self.robot.SetDOFValues([0.0,-1.57,1.57,0.0,0.0,0.0]) ## you may need to check this values.
+		self.robot.SetDOFValues([0.0,0.0,0.0,0.0,0.0,0.0]) ## you may need to check this values.
 		dummy_input = raw_input()
 		lower = np.concatenate((np.array([-0.01, -(pi/2-0.01), pi/2-0.01]), np.array([1., 1., 1.])*-3.14159265))
 		upper = np.concatenate((np.array([0.01, -(pi/2-0.01), pi/2+0.01]), np.array([1., 1., 1.])*3.14159265))
@@ -103,7 +103,9 @@ class IKSolver:
 		self.joint_states.position = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 		self.ee_goal = Vector3()
 		self.test_joints = JointState()
-		self.test_joints.position = [0.0,pi/2,0.0,0.0,0.0,0.0]
+		self.test_joints.position = [0.0,0.0,0.0,0.0,0.0,0.0]
+		# Tee: [0.8172 0.0812 0.0629 1.    ]
+		# joints: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
 
 		if START_NODE == True:
