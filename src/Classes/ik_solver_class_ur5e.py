@@ -100,10 +100,10 @@ class IKSolver:
 		self.joint_states = JointState()
 		## TODO: parametrize such that robot.GetJointNames()
 		self.joint_states.name = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
-		self.joint_states.position = [0.0, 0.0, pi/2, 0.0, 0.0, 0.0]
+		self.joint_states.position = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 		self.ee_goal = Vector3()
 		self.test_joints = JointState()
-		self.test_joints.position = [0.0,1.57,0.0,0.0,0.0,0.0]
+		self.test_joints.position = [0.0,pi/2,0.0,0.0,0.0,0.0]
 
 
 		if START_NODE == True:
@@ -153,7 +153,8 @@ class IKSolver:
 		## DEBUG purpose only
 		# print "self.test_joints.position", self.test_joints.position
 		self.robot.SetDOFValues(self.test_joints.position)
-		print "Tee:", self.Tee_current
+		print "Tee:", self.Tee_current[:,3]
+		print "joints:", self.joint_states.position
 		# print "Twrist_pose:", self.Twrist_pose
 		# print "Tee_pose:", DHmatrices.htm_to_pose(self.Tee_current)
 

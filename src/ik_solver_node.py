@@ -17,6 +17,6 @@ if __name__ == "__main__":
 	test_msg = Vector3()
 	while not rospy.is_shutdown():
 		current_time = rospy.Time.now()
-		print "Elapsed time iksolver:", (current_time-start_time)
+		# print "Elapsed time iksolver:", (current_time-start_time)
 		iksolver.update()
 		iksolver.r.sleep()
