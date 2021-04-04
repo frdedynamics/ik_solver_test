@@ -1,16 +1,22 @@
 
 from openravepy import *
-import sys
+import sys, os
 import numpy as np
 
 sys.path.append("/home/gizem/catkin_ws/src/ur5_with_hand_gazebo/src/Classes")
 from DH_matrices import DHmatrices
 
+sys.path.append("/home/gizem/catkin_ws/src/ur5_with_hand_gazebo/src/Classes")
+robot_dir = "/home/gizem/catkin_ws/src/ik_solver_test/robots/ur5e/xml/"
+robot_name = "ur5e.xml"
+robot_path = os.path.join(robot_dir, robot_name)
+
 
 env = Environment() # create the environment
 #env.Load('data/lab1.env.xml') # load a scene
 # env.Load('planar_3dof.xml') # load a scene
-env.Load('../xml/ur5e.xml') # load a scene
+# env.Load('../xml/ur5e.xml') # load a scene
+env.Load(robot_path) # load a scene
 env.SetViewer('qtcoin') # start the viewer
 robot = env.GetRobots()[0] # get the first robot
 print "Dof", robot.GetDOFValues()
@@ -19,27 +25,33 @@ print "Dof", robot.GetDOFValues()
 robot.SetDOFValues([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 dummy_input = raw_input("Change joints")
 
-robot.SetDOFValues([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-
 manip = robot.GetActiveManipulator()
 Tee = manip.GetEndEffectorTransform() # get end effector
+print "Tee:", Tee
 Tee_pose = DHmatrices.htm_to_pose(Tee)
 print "Tee_pose:", Tee_pose
-dummy_input = raw_input("Done?")
+Tee_np = DHmatrices.pose_to_htm(Tee_pose)
+print "Tee_htm:", Tee_np
+dummy_input = raw_input("Gone to IKmodel?")
+robot.SetDOFValues([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
 
-
-ikmodel=databases.inversekinematics.InverseKinematicsModel(robot,iktype=IkParameterization.Type.Transform6D)
+ikmodel=databases.inversekinematics.InverseKinematicsModel(robot,iktype=IkParameterization.Type.Translation3D)
 if not ikmodel.load():
     print "new ik model loading"
     ikmodel.autogenerate()
 
-print ikmodel.load()
-dummy_input = raw_input("Change joints")
+print "ikmodel file name:", ikmodel.getfilename(), ikmodel.load()
+dummy_input = raw_input("Go to Tee1?")
 
-robot.SetDOFValues([1.57, 0.0, 1.57, 0.0, 0.0, 0.0])
+Tee1 = np.array([[0.00,  1.00,  0.00,  0.817], [1.00,  0.00,  0.00, -0.232], [0.00,  0.00, -1.00,  0.062], [0.00,  0.00,  0.00,  1.00]])
+print Tee1
+ikparam = IkParameterization(Tee[0:3,3], ikmodel.iktype) # build up the translation3d ik query
+sol = self.manip.FindIKSolution(ikparam, IkFilterOptions.CheckEnvCollisions)
+robot.SetDOFValues(sol, ikmodel.manip.GetArmIndices())
 dummy_input = raw_input("Done?")
-sys.exit()
 
+robot.SetDOFValues([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+sys.exit()
 
 
 
