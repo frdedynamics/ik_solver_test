@@ -41,7 +41,7 @@ class IKSolver:
 		self.env.Load(robot_path) # load a scene
 		self.env.SetViewer('qtcoin') # start the viewer
 		self.robot = self.env.GetRobots()[0] # get the first robot
-		print "Dof", self.robot.GetDOFValues()
+		print "Dof:", self.robot.GetDOFValues()
 
 		# Set IK model
 		if ikmodel==1:
@@ -129,7 +129,7 @@ class IKSolver:
 		self.pub_Twrist_pose = rospy.Publisher('/Twrist_pose', Pose, queue_size=1)
 		# self.sub_hand_pose = rospy.Subscriber('/hand_pose', Pose, self.sub_hand_pose)
 		# self.sub_wrist_pose = rospy.Subscriber('/wrist_pose', Pose, self.sub_hand_pose)
-		self.sub_Tee_pose = rospy.Subscriber('/Tee_goal_pose', Pose, self.sub_Tee_pose)
+		self.sub_Tee_pose = rospy.Subscriber('/Tee_mapper_goal_pose', Pose, self.sub_Tee_pose)
 		self.sub_test_joint = rospy.Subscriber('/test_joints', JointState, self.sub_test_joint)
 		self.sub_selector = rospy.Subscriber('/selector', Int8, self.sub_selector)
 		# self.log_start_time = rospy.get_time()
