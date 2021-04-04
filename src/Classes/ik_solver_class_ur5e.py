@@ -73,7 +73,7 @@ class IKSolver:
 		self.Twrist_pose = DHmatrices.htm_to_pose(self.Twrist)
 
 		# Set joint limits
-		self.robot.SetDOFValues([0.0,0.0,0.0,0.0,0.0,0.0]) ## you may need to check this values.
+		self.robot.SetDOFValues([0.0,0.0,pi/2,0.0,0.0,0.0]) ## you may need to check this values.
 		dummy_input = raw_input()
 		lower = np.concatenate((np.array([-0.01, -(pi/2-0.01), pi/2-0.01]), np.array([1., 1., 1.])*-3.14159265))
 		upper = np.concatenate((np.array([0.01, -(pi/2-0.01), pi/2+0.01]), np.array([1., 1., 1.])*3.14159265))
@@ -83,14 +83,14 @@ class IKSolver:
 		# EE poses
 		Tee1 = np.array([[0.00,  1.00,  0.00,  1.18], [1.00,  0.00,  0.00, -0.743], [-0.00,  0.00, -1.00,  1.011], [0.00,  0.00,  0.00,  1.00]])
 		Tee2 = np.array([[0.00,  0.00,  -1.00,  0.496], [ 1.00,  0.00,  0.00, -0.743], [0.00,  -1.00, 0.00,  0.555], [ 0.00,  0.00,  0.00,  1.00]])
-		Tee3 = np.array([[1.00,  0.00, 0.00,  0.704], [0.00,  1.00, 0.00, -0.836], [0.00,  0.00,  1.00,  0.670], [0.00,  0.00,  0.00,  1.00]])
+		Tee3 = np.array([[1.00,  0.00, 0.00,  -0.817], [0.00,  0.00, -1.00, -0.232], [0.00,  1.00,  0.00,  0.620], [0.00,  0.00,  0.00,  1.00]])
 		# self.Tee_current = np.array([1.00,  0.00, 0.00,  0.00], [0.00,  1.00, 0.00,  0.00], [0.00,  0.00, 1.00,  0.00], [0.00,  0.00, 0.00,  1.00])
-		self.Tee_current = Tee1 ## for test only - constantly read by self.manip.GetEndEffectorTransform() # get end effector
+		self.Tee_current = Tee3 ## for test only - constantly read by self.manip.GetEndEffectorTransform() # get end effector
 		self.Tee_goal = np.zeros((4,4), dtype=np.float32) # gonna be calculated by ik
 
 
 		# IK parametrization init
-		self.ikparam = IkParameterization(self.Tee_current[0:3,3], self.ikmodel.iktype) # build up the translation3d ik query
+		self.ikparam = IkParameterization(Tee_current[0:3,3], self.ikmodel.iktype) # build up the translation3d ik query
 		self.sol = self.manip.FindIKSolution(self.ikparam, IkFilterOptions.CheckEnvCollisions)
 
 		# Init robot pose
@@ -103,7 +103,7 @@ class IKSolver:
 		self.joint_states.position = [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 		self.ee_goal = Vector3()
 		self.test_joints = JointState()
-		self.test_joints.position = [0.0,0.0,0.0,0.0,0.0,0.0]
+		self.test_joints.position = [0,0.0,0,0.0,0.0,0.0]
 		# Tee: [0.8172 0.0812 0.0629 1.    ]
 		# joints: [0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
@@ -140,8 +140,10 @@ class IKSolver:
 	def update(self):
 		tee_goal = self.Tee_goal
 		# self.calculate_joint_angles2(tee_goal)
-		self.joint_states.header.stamp = rospy.Time.now()
-		self.pub.publish(self.joint_states)
+		# self.joint_states.header.stamp = rospy.Time.now()
+		# self.pub.publish(self.joint_states)
+		self.test_joints.header.stamp = rospy.Time.now()
+		self.pub.publish(self.test_joints)
 
 		self.Tee_current = self.manip.GetEndEffectorTransform()
 		self.Tee_goal_pose = DHmatrices.htm_to_pose(self.Tee_current)
@@ -154,7 +156,7 @@ class IKSolver:
 
 		## DEBUG purpose only
 		# print "self.test_joints.position", self.test_joints.position
-		self.robot.SetDOFValues(self.test_joints.position)
+		# self.robot.SetDOFValues(self.test_joints.position)
 		print "Tee:", self.Tee_current[:,3]
 		print "joints:", self.joint_states.position
 		# print "Twrist_pose:", self.Twrist_pose
