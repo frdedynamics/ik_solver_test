@@ -1,0 +1,32 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "",
+        "limitSymbolsToIncludedHeaders": true
+      },
+      "includePath": [
+        "/home/gizem/catkin_ws/devel/include/**",
+        "/opt/ros/melodic/include/**",
+        "/home/gizem/catkin_ws/src/openrave_planning/arm_navigation_msgs/include/**",
+        "/home/gizem/catkin_ws/src/xsens_awinda_custom/awindamonitor/include/**",
+        "/home/gizem/catkin_ws/src/collada_urdf/collada_parser/include/**",
+        "/home/gizem/catkin_ws/src/collada_urdf/collada_urdf/include/**",
+        "/home/gizem/catkin_ws/src/src/Universal_Robots_ROS_Driver/controller_stopper/include/**",
+        "/home/gizem/catkin_ws/src/my_cpp_pkg/include/**",
+        "/home/gizem/catkin_ws/src/openrave_planning/openrave_robot_control/include/**",
+        "/home/gizem/catkin_ws/src/sc_3dof_ikfast_manipulator_plugin/include/**",
+        "/home/gizem/catkin_ws/src/turtlebot3_simulations/turtlebot3_fake/include/**",
+        "/home/gizem/catkin_ws/src/turtlebot3_simulations/turtlebot3_gazebo/include/**",
+        "/home/gizem/catkin_ws/src/turtlebot3/turtlebot3_slam/include/**",
+        "/home/gizem/catkin_ws/src/src/Universal_Robots_ROS_Driver/ur_calibration/include/**",
+        "/home/gizem/catkin_ws/src/src/Universal_Robots_ROS_Driver/ur_controllers/include/**",
+        "/home/gizem/catkin_ws/src/src/fmauch_universal_robot/ur_kinematics/include/**",
+        "/home/gizem/catkin_ws/src/src/Universal_Robots_ROS_Driver/ur_robot_driver/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS"
+    }
+  ],
+  "version": 4
+}
