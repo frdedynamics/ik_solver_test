@@ -58,7 +58,6 @@ class IKSolver:
 			self.ikmodel.autogenerate()
 			print "IK model created"
 		print "ikmodel file name:", self.ikmodel.getfilename(), self.ikmodel.load()
-		dummy_input = raw_input()
 		print "Load:", self.ikmodel.load()
 		print "Filename:", self.ikmodel.getfilename()
 		print "IKname:", self.ikmodel.getikname()
@@ -69,12 +68,15 @@ class IKSolver:
 		self.manip = self.robot.GetActiveManipulator()
 		self.Tee_current = self.manip.GetEndEffectorTransform() # get end effector
 
+		print "Tee_current", self.Tee_current
+		dummy_input = raw_input()
+		sys.exit()
+
 		self.Twrist = self.robot.GetLinks()[2].GetTransform() # get wrist transform
 		self.Twrist_pose = DHmatrices.htm_to_pose(self.Twrist)
 
 		# Set joint limits
-		self.robot.SetDOFValues([0.0,0.0,pi/2,0.0,0.0,0.0]) ## you may need to check this values.
-		dummy_input = raw_input()
+		# self.robot.SetDOFValues([0.0,0.0,pi/2,0.0,0.0,0.0]) ## you may need to check this values.
 		lower = np.concatenate((np.array([-0.01, -(pi/2-0.01), pi/2-0.01]), np.array([1., 1., 1.])*-3.14159265))
 		upper = np.concatenate((np.array([0.01, -(pi/2-0.01), pi/2+0.01]), np.array([1., 1., 1.])*3.14159265))
 		# self.robot.SetDOFLimits(lower, upper) ## So annoying but skip now
@@ -90,7 +92,7 @@ class IKSolver:
 
 
 		# IK parametrization init
-		self.ikparam = IkParameterization(Tee_current[0:3,3], self.ikmodel.iktype) # build up the translation3d ik query
+		self.ikparam = IkParameterization(self.Tee_current[0:3,3], self.ikmodel.iktype) # build up the translation3d ik query
 		self.sol = self.manip.FindIKSolution(self.ikparam, IkFilterOptions.CheckEnvCollisions)
 
 		# Init robot pose
