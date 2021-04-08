@@ -230,6 +230,7 @@ class IKSolver:
 		'''
 		self.test_joints.position = list(msg.position)
 
+
 	def sub_selector(self, msg):
 		'''
 		This is only for test purpose
@@ -241,3 +242,20 @@ class IKSolver:
 			self.Tee_goal = np.array([[0.0, 1.0, -0.01, 0.462], [1.0, 0.0, 0.0, -0.743], [0.0, -0.01, -1.0, 1.734], [0.0, 0.0, 0.0, 1.0]])
 		else:
 			print "non registered selection"
+
+
+	def fix_base(self, tee):
+		'''
+		m3: position: 
+			x: 0.15280000000000002
+			y: 0.0
+			z: 0.0
+			orientation: 
+			x: 0.5
+			y: 0.5
+			z: -0.5
+			w: -0.5
+		'''
+		fix_pose = Pose(Point(0.153, 0.0, 0.0), Quaternion(0.5, 0.5, -0.5, -0.5))
+		fix_htm = DHmatrices.pose_to_htm(fix_pose)
+		return np.matmul(np.asarray(tee), fix_htm)
