@@ -14,7 +14,7 @@ from math import sqrt, pi
 import numpy as np
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Vector3
-from geometry_msgs.msg import Pose
+from geometry_msgs.msg import Pose, Quaternion, Point
 from std_msgs.msg import Int8
 
 from openravepy import *
@@ -69,7 +69,24 @@ class IKSolver:
 		self.Tee_current = self.manip.GetEndEffectorTransform() # get end effector
 
 		print "Tee_current", self.Tee_current
-		dummy_input = raw_input()
+		# dummy_input = raw_input()
+		"""
+		The transformation from wrist_3_link to tool 0 is fixed
+			- Translation: [0.000, 0.082, 0.000]
+			- Rotation: in Quaternion [-0.707, 0.000, 0.000, 0.707]	
+		"""
+		# fix_pose = Pose(Point(0.000, 0.000, 0.000), Quaternion(0.000, 0.000, 0.707, 0.707))
+		# fix_htm = DHmatrices.pose_to_htm(fix_pose)
+		# tee_corrected = np.matmul(np.asarray(self.Tee_current), fix_htm)
+		# print tee_corrected
+
+		m1 = np.array([[0.0, 1.0, 0.0, 0.817], [1.0, 0.0, 0.0, 0.0812], [0.0, 0.0, -1.0, 0.0629], [0.0, 0.0, 0.0, 1.0]])
+		m2 = np.array([[1.0, 0.0, 0.0, 0.817], [0.0, 0.0, -1.0, 0.234], [0.0, 1.0, 0.0, 0.0629], [0.0, 0.0, 0.0, 1.0]])
+
+		m3 = np.matmul(np.linalg.inv(m1), m2)
+		m3_pose = DHmatrices.htm_to_pose(m3)
+		print "m3:", m3_pose
+
 		sys.exit()
 
 		self.Twrist = self.robot.GetLinks()[2].GetTransform() # get wrist transform
