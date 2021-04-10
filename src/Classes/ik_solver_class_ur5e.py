@@ -28,6 +28,7 @@ from DH_matrices import DHmatrices
 
 _ROSTIME_START = 0
 test_pub_msg = Vector3()
+Tee_fail = np.zeros((4,4))
 
 
 class IKSolver:
@@ -81,6 +82,7 @@ class IKSolver:
 		self.Tee_current = Tee1 ## for test only - constantly read by self.manip.GetEndEffectorTransform() # get end effector
 		# self.Tee_goal = np.zeros((4,4), dtype=np.float32) # gonna be calculated by ik
 		self.Tee_goal = Tee1
+	
 
 
 		# IK parametrization init
@@ -133,6 +135,7 @@ class IKSolver:
 		# tee_goal = self.Tee_goal
 		# self.calculate_joint_angles2(tee_goal)
 		# self.Tee_goal = np.array([[0.00,  1.00,  0.00,  0.817], [1.00,  0.00,  0.00, -0.232], [0.00,  0.00, -1.00,  0.062], [0.00,  0.00,  0.00,  1.00]])
+		
 		self.calculate_joint_angles()
 		# self.joint_states.header.stamp = rospy.Time.now()
 		# self.pub.publish(self.joint_states)
@@ -151,21 +154,28 @@ class IKSolver:
 		Given ee_goal, calculate joint angles. Do I need to pull ee_goal?
 		@params ee_goal: type np.array(4x4) HTM
 		'''
+		global Tee_fail
+		comparison = self.Tee_goal == Tee_fail
 		if (type(self.Tee_goal)==np.ndarray) and (self.Tee_goal.shape == (4,4)):
-			print "Tee_goal:", self.Tee_goal
-			try:
-				self.ikparam = IkParameterization(self.Tee_goal[0:3,3], self.ikmodel.iktype) # build up the translation3d ik query
-				self.sol = self.manip.FindIKSolution(self.ikparam, IkFilterOptions.CheckEnvCollisions)
-				self.robot.SetDOFValues(self.sol,self.ikmodel.manip.GetArmIndices())
-				self.joint_states.position = self.robot.GetDOFValues()
-				if self.sol is not None and len(self.sol) > 0: # if found, then break
-					print len(self.sol)
-				else:
-					raise openrave_exception("No solution")
-			except openrave_exception, e:
-				print e
-			# print "Tee_goal:", self.Tee_goal
-			# print "joint positions:", self.joint_states.position
+			if not comparison.all():
+				print "Tee_goal:", self.Tee_goal
+				try:
+					self.ikparam = IkParameterization(self.Tee_goal[0:3,3], self.ikmodel.iktype) # build up the translation3d ik query
+					self.sol = self.manip.FindIKSolution(self.ikparam, IkFilterOptions.CheckEnvCollisions)
+					self.robot.SetDOFValues(self.sol,self.ikmodel.manip.GetArmIndices())
+					self.joint_states.position = self.robot.GetDOFValues()
+					if self.sol is not None and len(self.sol) > 0: # if found, then break
+						print len(self.sol)
+					else:
+						Tee_fail = self.Tee_goal
+						raise openrave_exception("No solution")
+				except openrave_exception, e:
+					print e
+				# print "Tee_goal:", self.Tee_goal
+				# print "joint positions:", self.joint_states.position
+			else:
+				print "The same invalid Tee"
+
 
 		else:
 			print "Unknown ee_type"
