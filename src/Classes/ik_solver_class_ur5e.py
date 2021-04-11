@@ -78,6 +78,17 @@ class IKSolver:
 		self.Tee_current = self.manip.GetEndEffectorTransform() # get end effector
 		print "selected ee:", self.manip.GetEndEffector()
 
+		print "Active Dofs:", self.robot.GetActiveDOF()
+		self.robot.SetActiveDOFs([3, 4, 5])
+		print "Active Dofs:", self.robot.GetActiveDOF()
+		print self.robot.GetAffineDOF()
+
+		lower = np.concatenate((np.array([-0.01, -(pi/2-0.01), pi/2-0.01]), np.array([1., 1., 1.])*-3.14159265))
+		upper = np.concatenate((np.array([0.01, -(pi/2-0.01), pi/2+0.01]), np.array([1., 1., 1.])*3.14159265))
+		self.robot.SetAffineRotationAxisLimits(lower,upper)
+		print self.robot.GetAffineDOF()
+		sys.exit()
+
 		# Set joint limits
 		null = [pi/2, -pi/2, 0.0, 0.0, 0.0, 0.0]
 		home = [pi/2, -pi/2, 0.0, pi, -pi/2, 0.0]
@@ -108,7 +119,7 @@ class IKSolver:
 
 		lower = np.concatenate((np.array([-0.01, -(pi/2-0.01), pi/2-0.01]), np.array([1., 1., 1.])*-3.14159265))
 		upper = np.concatenate((np.array([0.01, -(pi/2-0.01), pi/2+0.01]), np.array([1., 1., 1.])*3.14159265))
-		self.robot.SetDOFLimits(lower, upper)
+		# self.robot.SetDOFLimits(lower, upper)
 		# print "DOF limits:", self.robot.GetDOFLimits()
 
 		# # EE poses
