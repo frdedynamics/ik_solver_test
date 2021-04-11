@@ -41,8 +41,14 @@ class IKSolver:
 		self.env = Environment()
 		self.env.Load(robot_path) # load a scene
 		self.env.SetViewer('qtcoin') # start the viewer
+		viewer = self.env.GetViewer()
+		viewer.SetCamera([[0.,  0., -1., 2.],
+							[1.,  0.,  0., 0.],
+							[0., -1.,  0., .5],
+							[0.,  0.,  0., 1.]])
 		self.robot = self.env.GetRobots()[0] # get the first robot
 		print "Dof", self.robot.GetDOFValues()
+		RaveSetDebugLevel(DebugLevel.Debug)
 
 		# Set IK model
 		if ikmodel==1:
