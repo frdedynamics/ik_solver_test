@@ -5,12 +5,13 @@ Created using ikfastpy:
 python `openrave-config --python-dir`/openravepy/_openravepy_/ikfast.py --robot=ur5e.robot.xml --iktype=translation3d --baselink=3 --eelink=6 --savefile=ikfast31.cpp --maxcasedepth 1
 
 """
-
+import os, sys
 import numpy as np
-import ikfastpy
 from math import pi
 from sklearn.metrics import mean_squared_error as mse
-import sys
+
+sys.path.append("/home/gizem/catkin_ws/src/ik_solver_test/ext-solvers/ur5e_3d")
+import ikfastpy
 
 
 class IK_UR5ETRANS3D:
