@@ -1,7 +1,8 @@
 import numpy as np
 import ikfastpy
-from math import pi
+from math import pi, sqrt
 import sys
+from geometry_msgs.msg import Pose, Point, Quaternion
 
 # Initialize kinematics for UR5 robot arm
 # ur5_kin = ikfastpy.PyKinematics()
@@ -43,11 +44,28 @@ from ik_ur5e_translate_3d import IK_UR5ETRANS3D
 
 IK = IK_UR5ETRANS3D()
 
+sys.path.append("/home/gizem/catkin_ws/src/ur5_with_hand_gazebo/src/Classes")
+from DH_matrices import DHmatrices
+
+def mag(ee):
+    r = sqrt((ee[0]**2) + (ee[1]**2) + (ee[2]**2))
+    return r
+
 joint_angles = np.array([0.0,0.1,0.]) # in radians
-ee_calc = IK.calc_forward_kin(joint_angles.tolist())
-print ee_calc
+ee_calc_1 = IK.calc_forward_kin(joint_angles.tolist())
+print "mag1:", mag(ee_calc_1)
+
+joint_angles = np.array([0.3,0.1,-0.7]) # in radians
+ee_calc_2 = IK.calc_forward_kin(joint_angles.tolist())
+print "mag2:", mag(ee_calc_2)
+
+sys.exit()
+
 
 ee_coord = [0.1, 0.22650042, 0.00998334]
+hand_pose = Pose(Point(ee_coord[0], ee_coord[1], ee_coord[2]), Quaternion(0., 0., 0., 1.))
+wrist_pose = Pose(Point(0., 0., 0.), Quaternion(0., 0., 0., 1.))
+param_z = DHmatrices.ee_goal_calculate(hand_pose, wrist_pose, param='z')
 joints_calc = IK.calc_inverse_kin(ee_coord)
 print joints_calc
 
