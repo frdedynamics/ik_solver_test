@@ -65,15 +65,7 @@ class IKSolver:
 			self.iksolver = IK_UR5ETRANS3D
 		else:
 			sys.exit("IK type not known")
-			HOW THE FUCK AM ı GONNA GET WRİST TRANSFORM NOW? tOMORROW.
-		self.ikmodel = databases.inversekinematics.InverseKinematicsModel(robot=self.robot,iktype=self.iktype)
-		if not self.ikmodel.load():
-			print "New IK model is creating.."
-			self.ikmodel.autogenerate()
-			print "IK model created"
-		print "Load:", self.ikmodel.load()
-		print "Filename:", self.ikmodel.getfilename()
-		print "IKname:", self.ikmodel.getikname()
+
 
 		# Set active manipulator bases
 		self.basemanip = interfaces.BaseManipulation(self.robot)
@@ -82,16 +74,6 @@ class IKSolver:
 		self.Tee_current = self.manip.GetEndEffectorTransform() # get end effector
 		print "selected ee:", self.manip.GetEndEffector()
 
-		print "Active Dofs:", self.robot.GetActiveDOF()
-		self.robot.SetActiveDOFs([3, 4, 5])
-		print "Active Dofs:", self.robot.GetActiveDOF()
-		print self.robot.GetAffineDOF()
-
-		lower = np.concatenate((np.array([-0.01, -(pi/2-0.01), pi/2-0.01]), np.array([1., 1., 1.])*-3.14159265))
-		upper = np.concatenate((np.array([0.01, -(pi/2-0.01), pi/2+0.01]), np.array([1., 1., 1.])*3.14159265))
-		self.robot.SetAffineRotationAxisLimits(lower,upper)
-		print self.robot.GetAffineDOF()
-
 		# Set joint limits
 		null = [pi/2, -pi/2, 0.0, 0.0, 0.0, 0.0]
 		home = [pi/2, -pi/2, 0.0, pi, -pi/2, 0.0]
@@ -99,6 +81,8 @@ class IKSolver:
 		
 		home2 = [pi/2, -pi/2., pi/2, pi, -pi/2, 0.0]
 		self.robot.SetDOFValues(home2) 
+		dummy_input = raw_input("Done?")
+		sys.exit()
 		print "home:", self.manip.GetEndEffectorTransform() # get end effector
 		dummy_input = raw_input("Next?")
 		self.Twrist = self.robot.GetLink('wrist_1_link').GetTransform()
