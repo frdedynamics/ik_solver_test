@@ -59,13 +59,12 @@ joint_angles = np.array([0.3,0.1,-0.7]) # in radians
 ee_calc_2 = IK.calc_forward_kin(joint_angles.tolist())
 print "mag2:", mag(ee_calc_2)
 
-sys.exit()
-
 
 ee_coord = [0.1, 0.22650042, 0.00998334]
 hand_pose = Pose(Point(ee_coord[0], ee_coord[1], ee_coord[2]), Quaternion(0., 0., 0., 1.))
 wrist_pose = Pose(Point(0., 0., 0.), Quaternion(0., 0., 0., 1.))
-param_z = DHmatrices.ee_goal_calculate(hand_pose, wrist_pose, param='z')
+param_x = DHmatrices.ee_goal_calculate(hand_pose, wrist_pose, param='x')
+sys.exit(param_x)
 joints_calc = IK.calc_inverse_kin(ee_coord)
 print joints_calc
 
