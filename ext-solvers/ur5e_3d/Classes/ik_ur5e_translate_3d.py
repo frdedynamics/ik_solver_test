@@ -63,5 +63,5 @@ class IK_UR5ETRANS3D:
     def choose_closest_soln(self, current_angles):
         diff = []
         for joint_config in self.joint_configs:
-            diff.append(mse(joint_config, current_angles.tolist()))
+            diff.append(mse(joint_config, current_angles))
         return self.joint_configs[diff.index(min(diff))]

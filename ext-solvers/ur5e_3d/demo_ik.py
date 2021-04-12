@@ -51,4 +51,5 @@ ee_coord = [0.1, 0.22650042, 0.00998334]
 joints_calc = IK.calc_inverse_kin(ee_coord)
 print joints_calc
 
-current_joints = []
+current_joints = np.array([0.0, 0.1, 0.0]).tolist()
+print IK.choose_closest_soln(current_joints)
