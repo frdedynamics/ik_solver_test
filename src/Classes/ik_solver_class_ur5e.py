@@ -19,15 +19,18 @@ from std_msgs.msg import Int8
 
 from openravepy import *
 
-sys.path.append("/home/gizem/catkin_ws/src/ur5_with_hand_gazebo/src/Classes")
 robot_dir = "/home/gizem/catkin_ws/src/ik_solver_test/robots/ur5e/xml/"
 robot_name = "ur5e.xml"
 robot_path = os.path.join(robot_dir, robot_name)
+
+
+sys.path.append("/home/gizem/catkin_ws/src/ur5_with_hand_gazebo/src/Classes")
 from DH_matrices import DHmatrices
 
+sys.path.append("/home/gizem/catkin_ws/src/ik_solver_test/ext-solvers/ur5e_3d/Classes")
+from ik_ur5e_translate_3d import IK_UR5ETRANS3D
 
-_ROSTIME_START = 0
-test_pub_msg = Vector3()
+IK = IK_UR5ETRANS3D()
 Tee_fail = np.zeros((4,4))
 
 
@@ -56,12 +59,13 @@ class IKSolver:
 				
 		# Set IK model
 		if ikmodel==1:
-			self.iktype = IkParameterization.Type.Transform6D
+			print "Not ready"
+			## Create another solver Transform6D. Initiate here
 		elif ikmodel==2:
-			self.iktype = IkParameterization.Type.Translation3D
+			self.iksolver = IK_UR5ETRANS3D
 		else:
 			sys.exit("IK type not known")
-			
+			HOW THE FUCK AM ı GONNA GET WRİST TRANSFORM NOW? tOMORROW.
 		self.ikmodel = databases.inversekinematics.InverseKinematicsModel(robot=self.robot,iktype=self.iktype)
 		if not self.ikmodel.load():
 			print "New IK model is creating.."
@@ -87,7 +91,6 @@ class IKSolver:
 		upper = np.concatenate((np.array([0.01, -(pi/2-0.01), pi/2+0.01]), np.array([1., 1., 1.])*3.14159265))
 		self.robot.SetAffineRotationAxisLimits(lower,upper)
 		print self.robot.GetAffineDOF()
-		sys.exit()
 
 		# Set joint limits
 		null = [pi/2, -pi/2, 0.0, 0.0, 0.0, 0.0]
@@ -138,7 +141,9 @@ class IKSolver:
 		# self.sol = self.manip.FindIKSolution(self.ikparam, IkFilterOptions.CheckEnvCollisions)
 		dummy_input = raw_input("Start Tee_home")
 		self.ikparam = IkParameterization(Tee_home[0:3,3], self.ikmodel.iktype) # build up the translation3d ik query
-		self.sol = self.manip.FindIKSolution(self.ikparam, IkFilterOptions.CheckEnvCollisions)
+		self.ikparam2 = IkParameterization(Tee_home, IkParameterization.Type.Transform6D) # build up the translation3d ik query
+		dummy_input =raw_input("ikparam changed")
+		self.sol = self.manip.FindIKSolutions(self.ikparam2, IkFilterOptions.CheckEnvCollisions)
 		self.robot.SetDOFValues(self.sol, self.ikmodel.manip.GetArmIndices())
 		dummy_input = raw_input("Next Tee2")
 
