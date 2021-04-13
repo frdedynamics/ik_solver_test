@@ -30,7 +30,6 @@ from DH_matrices import DHmatrices
 sys.path.append("/home/gizem/catkin_ws/src/ik_solver_test/ext-solvers/ur5e_3d/Classes")
 from ik_ur5e_translate_3d import IK_UR5ETRANS3D
 
-IK = IK_UR5ETRANS3D()
 Tee_fail = np.zeros((4,4))
 
 
@@ -57,12 +56,15 @@ class IKSolver:
 		print "Dof", self.robot.GetDOFValues()
 		# RaveSetDebugLevel(DebugLevel.Debug)
 				
+
 		# Set IK model
 		if ikmodel==1:
-			print "Not ready"
+			print "Transform6D is not implemented yet"
+			print "See README to create"
+			sys.exit()
 			## Create another solver Transform6D. Initiate here
 		elif ikmodel==2:
-			self.iksolver = IK_UR5ETRANS3D
+			self.iksolver = IK_UR5ETRANS3D()
 		else:
 			sys.exit("IK type not known")
 
@@ -74,93 +76,49 @@ class IKSolver:
 		self.Tee_current = self.manip.GetEndEffectorTransform() # get end effector
 		print "selected ee:", self.manip.GetEndEffector()
 
-		# Set joint limits
-		null = [pi/2, -pi/2, 0.0, 0.0, 0.0, 0.0]
-		home = [pi/2, -pi/2, 0.0, pi, -pi/2, 0.0]
-		
-		
-		home2 = [pi/2, -pi/2., pi/2, pi, -pi/2, 0.0]
-		self.robot.SetDOFValues(home2) 
-		dummy_input = raw_input("Done?")
-		sys.exit()
-		print "home:", self.manip.GetEndEffectorTransform() # get end effector
+
+		# Initial poses
+		home = [pi/2, -pi/2., pi/2, pi, -pi/2, 0.0]
+		self.robot.SetDOFValues(home) 
 		dummy_input = raw_input("Next?")
+		home = [pi/2, -pi/2., pi/2, 0.0,0.1,0.]
+		self.robot.SetDOFValues(home) 
+		dummy_input = raw_input("Next?")
+		home = [pi/2, -pi/2., pi/2, 0.0,0.1,0.3]
+		self.robot.SetDOFValues(home) 
+		dummy_input = raw_input("Next?")
+		home = [pi/2, -pi/2., pi/2, 1.0,-0.2,0.]
+		self.robot.SetDOFValues(home) 
+		dummy_input = raw_input("Next?")
+		home = [pi/2, -pi/2., pi/2, -1.4,-0.7,0.]
+		self.robot.SetDOFValues(home) 
+		dummy_input = raw_input("Next?")
+		home = [pi/2, -pi/2., pi/2, -1.4,-1.9,0.]
+		self.robot.SetDOFValues(home) 
+		dummy_input = raw_input("Next?")
+		home = [pi/2, -pi/2., pi/2, -1.4,-2.7,0.]
+		self.robot.SetDOFValues(home) 
+		dummy_input = raw_input("Next?")
+		sys.exit(0)
+		self.robot.SetDOFValues(home) 
+		Tee_home = np.asarray(self.manip.GetEndEffectorTransform())
+		print "Tee_home:", self.manip.GetEndEffectorTransform() # get end effector
+
 		self.Twrist = self.robot.GetLink('wrist_1_link').GetTransform()
 		print self.Twrist  ## don't update this. Initial is our pivot point. Otherwise it changes with wrist_1 rotation
-		Tee_home = np.asarray(self.manip.GetEndEffectorTransform())
-		print "Tee_home:", Tee_home
 
-		test2 = [pi/2, -pi/2., pi/2, pi+pi/6, -pi/2, 0.0]
-		self.robot.SetDOFValues(test2)
-		print "test2:", self.manip.GetEndEffectorTransform() # get end effector
-		dummy_input = raw_input("Next?")
-		Tee2 = np.asarray(self.manip.GetEndEffectorTransform())
-		print "Tee2:", Tee2
-
-		test3 = [pi/2, -pi/2., pi/2, pi, -pi/2+pi/7, 0.0]
-		self.robot.SetDOFValues(test3)
-		print "test3:", self.manip.GetEndEffectorTransform() # get end effector
-		dummy_input = raw_input("Next?")
-		Tee3 = np.asarray(self.manip.GetEndEffectorTransform())
-		print "Tee3:", Tee3
-
-		lower = np.concatenate((np.array([-0.01, -(pi/2-0.01), pi/2-0.01]), np.array([1., 1., 1.])*-3.14159265))
-		upper = np.concatenate((np.array([0.01, -(pi/2-0.01), pi/2+0.01]), np.array([1., 1., 1.])*3.14159265))
-		# self.robot.SetDOFLimits(lower, upper)
-		# print "DOF limits:", self.robot.GetDOFLimits()
-
-		# # EE poses
-		# Tee1 = np.array([[0.00,  -1.00,  0.00,  -0.0812], [1.00,  0.00,  0.00, 0.3922], [-0.00,  0.00, 1.00,  0.687], [0.00,  0.00,  0.00,  1.00]])
-		# Tee2 = np.array([[0.00,  0.00,  -1.00,  0.496], [ 1.00,  0.00,  0.00, -0.743], [0.00,  -1.00, 0.00,  0.555], [ 0.00,  0.00,  0.00,  1.00]])
-		# Tee3 = np.array([[1.00,  0.00, 0.00,  0.704], [0.00,  1.00, 0.00, -0.836], [0.00,  0.00,  1.00,  0.670], [0.00,  0.00,  0.00,  1.00]])
-		# self.Tee_current = np.array([1.00,  0.00, 0.00,  0.00], [0.00,  1.00, 0.00,  0.00], [0.00,  0.00, 1.00,  0.00], [0.00,  0.00, 0.00,  1.00])
-		# self.Tee_current = Tee1 ## for test only - constantly read by self.manip.GetEndEffectorTransform() # get end effector
-		# self.Tee_goal = np.zeros((4,4), dtype=np.float32) # gonna be calculated by ik
-		# self.Tee_goal = Tee1
-	
-
-
-		# IK parametrization init
-		# self.ikparam = IkParameterization(self.Tee_current[0:3,3], self.ikmodel.iktype) # build up the translation3d ik query
-		# self.sol = self.manip.FindIKSolution(self.ikparam, IkFilterOptions.CheckEnvCollisions)
-		dummy_input = raw_input("Start Tee_home")
-		self.ikparam = IkParameterization(Tee_home[0:3,3], self.ikmodel.iktype) # build up the translation3d ik query
-		self.ikparam2 = IkParameterization(Tee_home, IkParameterization.Type.Transform6D) # build up the translation3d ik query
-		dummy_input =raw_input("ikparam changed")
-		self.sol = self.manip.FindIKSolutions(self.ikparam2, IkFilterOptions.CheckEnvCollisions)
-		self.robot.SetDOFValues(self.sol, self.ikmodel.manip.GetArmIndices())
-		dummy_input = raw_input("Next Tee2")
-
-		self.ikparam = IkParameterization(Tee2[0:3,3], self.ikmodel.iktype) # build up the translation3d ik query
-		self.sol = self.manip.FindIKSolution(self.ikparam, IkFilterOptions.CheckEnvCollisions)
-		self.robot.SetDOFValues(self.sol, self.ikmodel.manip.GetArmIndices())
-		dummy_input = raw_input("Next Tee3")
-
-		self.ikparam = IkParameterization(Tee3[0:3,3], self.ikmodel.iktype) # build up the translation3d ik query
-		self.sol = self.manip.FindIKSolution(self.ikparam, IkFilterOptions.CheckEnvCollisions)
-		self.robot.SetDOFValues(self.sol, self.ikmodel.manip.GetArmIndices())
-		dummy_input = raw_input("Done")
-		sys.exit()
-
-
-		# Init robot pose
-		self.robot.SetDOFValues(self.sol, self.ikmodel.manip.GetArmIndices())
-
-		Tee = self.manip.GetEndEffectorTransform()
-		Tee_pose = DHmatrices.htm_to_pose(Tee)
-		# print "Tee:", Tee
-		dummy_input = raw_input("Done?")
-		sys.exit()
 
 		# Updated parameters
 		self.joint_states = JointState()
 		## TODO: parametrize such that robot.GetJointNames()
 		self.joint_states.name = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
-		self.joint_states.position = [0.0, 0.0, pi/2, 0.0, 0.0, 0.0]
-		self.ee_goal = Vector3()
-		self.test_joints = JointState()
-		self.test_joints.position = [0.0,1.57,0.0,0.0,0.0,0.0]
+		self.joint_states.position = home
 		
+		# self.test_joints = JointState()
+		# self.test_joints.position = [0.0,1.57,0.0,0.0,0.0,0.0]
+
+		self.Tee_goal = np.eye(4,4)
+		self.Tee_current = Pose() ## To publish /Tee_calculated for DEBUG
 		
 		if START_NODE == True:
 			rospy.init_node("ik_solver_node")
@@ -182,7 +140,7 @@ class IKSolver:
 		self.pub_calculated_tee = rospy.Publisher('/Tee_calculated', Pose, queue_size=1) # For debug purposes
 		# self.pub_test = rospy.Publisher('/test_msg', Vector3, queue_size=1) #
 
-		self.sub_Tee_pose = rospy.Subscriber('//Tee_mapper_goal_pose', Pose, self.sub_Tee_pose)
+		self.sub_Tee_pose = rospy.Subscriber('/Tee_mapper_goal_pose', Pose, self.sub_Tee_pose)
 		self.sub_test_joint = rospy.Subscriber('/test_joints', JointState, self.sub_test_joint)
 		# self.sub_selector = rospy.Subscriber('/selector', Int8, self.sub_selector)
 		# self.log_start_time = rospy.get_time()
@@ -219,52 +177,43 @@ class IKSolver:
 		if (type(self.Tee_goal)==np.ndarray) and (self.Tee_goal.shape == (4,4)):
 			comparison = self.Tee_goal == Tee_fail
 			if not comparison.all():
-				print "Tee_goal:", self.Tee_goal
-				try:
-					self.ikparam = IkParameterization(self.Tee_goal[0:3,3], self.ikmodel.iktype) # build up the translation3d ik query
-					self.sols = self.manip.FindIKSolution(self.ikparam, IkFilterOptions.CheckEnvCollisions)
-					self.robot.SetDOFValues(self.sols,self.ikmodel.manip.GetArmIndices())
-					self.joint_states.position = self.robot.GetDOFValues()
-					if self.sols is not None and len(self.sols) > 0: # if found, then break
-						print len(self.sols)
-						for sol in self.sols:
-							print sol
+				print "Tee_goal:", self.Tee_goal[0:3,3]
+				tpose = [0.24770613, 0.00644665, -0.00000013]
+				tpose = [0.1, 0.22650042, 0.00998334]
+
+				try: 
+					ur_wrist_joints_all = self.iksolver.calc_inverse_kin(self.Tee_goal[0:3,3].tolist())
+					# ur_wrist_joints_all = self.iksolver.calc_inverse_kin(tpose)
+					if self.iksolver.n_solutions > 0:
+						ur_wrist_joints = self.iksolver.choose_closest_soln(self.joint_states.position[3:])
+						print "calculated joints:", ur_wrist_joints
+						self.joint_states.position[3] = ur_wrist_joints[0]
+						self.joint_states.position[4] = ur_wrist_joints[1]
+						self.joint_states.position[5] = ur_wrist_joints[2]
 					else:
 						Tee_fail = self.Tee_goal
-						raise openrave_exception("No solution")
+						# raise openrave_exception("No solution")
 				except openrave_exception, e:
 					print e
 				# print "Tee_goal:", self.Tee_goal
-				print "joint positions:", self.joint_states.position
+				# print "joint positions:", self.joint_states.position
 			else:
-				print "The same invalid Tee"
+				# print "The same invalid Tee"
+				pass
 
 
 		else:
 			print "Unknown ee_type"
 	
-	def calculate_joint_angles2(self, tee_goal):
-		'''
-		Given ee_goal, calculate joint angles. Do I need to pull ee_goal?
-		@params ee_goal: type np.array(4x4) HTM
-		'''
-		if (type(tee_goal)==np.ndarray) and (tee_goal.shape == (4,4)):
-			self.ikparam = IkParameterization(tee_goal[0:3,3], self.ikmodel.iktype) # build up the translation3d ik query
-			self.sol = self.manip.FindIKSolution(self.ikparam, IkFilterOptions.CheckEnvCollisions)
-			self.robot.SetDOFValues(self.sol,self.ikmodel.manip.GetArmIndices())
-			self.joint_states.position = self.robot.GetDOFValues()
-			# print "Tee_goal:", tee_goal
-			# print "joint positions:", self.joint_states.position
 
-		else:
-			print "Unknown ee_type"
 
 	def sub_Tee_pose(self, msg):
 		'''
 		Subscribes Tee_pose {Pose()}, converts it to Tee {np.array()}
 		'''
 		Tee_goal_pose = msg
-		print "Tee_goal_pose:", Tee_goal_pose
+		# print "Tee_goal_pose:", Tee_goal_pose
+		mag = sqrt((Tee_goal_pose.position.x**2) + (Tee_goal_pose.position.y**2) + (Tee_goal_pose.position.z**2))
 		self.Tee_goal = DHmatrices.pose_to_htm(Tee_goal_pose)
 		
 		
