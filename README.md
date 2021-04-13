@@ -272,3 +272,63 @@ Mayavi cannot run on my PC atm.
 ![image-20210329143927049](/home/gizem/snap/typora/33/.config/Typora/typora-user-images/image-20210329143927049.png)
 
 ![image-20210329144014081](/home/gizem/snap/typora/33/.config/Typora/typora-user-images/image-20210329144014081.png)
+
+
+
+
+
+# Externally create ik.cpp
+
+From here: https://github.com/andyzeng/ikfastpy
+
+At first, you must have these files available:
+├── ikfast.h
+├── ikfastpy.pyx
+├── ikfast_wrapper.cpp
+├── Kinematics.hpp
+├── setup.py
+└── ur5e.robot.xml
+
+Then compute this 
+
+```
+python `openrave-config --python-dir`/openravepy/_openravepy_/ikfast.py --robot=ur5e.robot.xml --iktype=translation3d --baselink=3 --eelink=6 --savefile=ikfast31.cpp --maxcasedepth 1
+```
+
+Result:
+
+├── ikfast31.cpp
+is created
+
+And finally compute `python setup.py build_ext --inplace`
+
+
+
+**If you want to change the ik.cpp:**
+
+> ikfast_wrapper.cpp:65:10: #include "ikfile.cpp" 
+
+
+
+### Current available values
+
+My workspace: for ur5: `/home/gizem/Documents/OnedriveHVL/Workspaces/PythonWS/ikfastpy/ur5_original`
+
+![image-20210408233046614](/home/gizem/snap/typora/33/.config/Typora/typora-user-images/image-20210408233046614.png)
+
+​							for ur5e: `/home/gizem/Documents/OnedriveHVL/Workspaces/PythonWS/ikfastpy/ur5e`
+
+![image-20210408232835113](/home/gizem/snap/typora/33/.config/Typora/typora-user-images/image-20210408232835113.png)![image-20210408233425986](/home/gizem/snap/typora/33/.config/Typora/typora-user-images/image-20210408233425986.png)
+
+```
+python `openrave-config --python-dir`/openravepy/_openravepy_/ikfast.py --robot=ur5e.robot.xml --iktype=translation3d --baselink=3 --eelink=6 --savefile=ikfast31.cpp --maxcasedepth 1
+```
+
+
+
+**Note:** Don't forget to create ikfast61.cpp or ikfast31.cpp
+
+**Known issues**
+
+* ImportError: No module named ikfastpy
+  * Add os.path 
