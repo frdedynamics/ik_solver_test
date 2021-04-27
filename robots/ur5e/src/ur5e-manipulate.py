@@ -18,29 +18,30 @@ env = Environment() # create the environment
 # env.Load('../xml/ur5e.xml') # load a scene
 env.Load(robot_path) # load a scene
 env.SetViewer('qtcoin') # start the viewer
+viewer = env.GetViewer()
 robot = env.GetRobots()[0] # get the first robot
 print "Dof", robot.GetDOFValues()
 
 
-robot.SetDOFValues([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
-dummy_input = raw_input("Change joints")
-robot.SetDOFValues([-0.95057231,  2.65834737, -1.22379041, -3.06405115,  1.45200026, -0.88941813])
-dummy_input = raw_input("Change joints")
-robot.SetDOFValues([-0.95057231,  2.52574301, -1.52847648,  0.5148319,  -1.45200026,  2.25217462])
-dummy_input = raw_input("Change joints")
-robot.SetDOFValues([ 1.29999983,  2.07419062, -1.5507617,  -1.96502137,  1.60000002, -3.1415925 ])
-dummy_input = raw_input("Change joints")
-robot.SetDOFValues([ 1.29999983,  1.64518237, -1.20000005,  1.25481772,  -1.60000002,  0.0] )
-dummy_input = raw_input("Change joints")
-robot.SetDOFValues([-0.95057231,  1.49078465,  1.22379041,  1.939116,    1.45200026, -0.88941813])
-dummy_input = raw_input("Change joints")
-robot.SetDOFValues([-0.95057231,  1.07405365,  1.52847648, -1.09043157, -1.45200026,  2.25217462])
-dummy_input = raw_input("Change joints")
-robot.SetDOFValues([ 1.29999983,  0.60194546,  1.5507617,   2.68888545,  1.60000002, -3.1415925 ])
-dummy_input = raw_input("Change joints")
-robot.SetDOFValues([ 1.29999983,  0.50000000,  1.20000005, 0.0,  -1.60000002,  0.0])
-dummy_input = raw_input("Change joints")
-sys.exit()
+
+# dummy_input = raw_input("Change joints")
+# robot.SetDOFValues([-0.95057231,  2.65834737, -1.22379041, -3.06405115,  1.45200026, -0.88941813])
+# dummy_input = raw_input("Change joints")
+# robot.SetDOFValues([-0.95057231,  2.52574301, -1.52847648,  0.5148319,  -1.45200026,  2.25217462])
+# dummy_input = raw_input("Change joints")
+# robot.SetDOFValues([ 1.29999983,  2.07419062, -1.5507617,  -1.96502137,  1.60000002, -3.1415925 ])
+# dummy_input = raw_input("Change joints")
+# robot.SetDOFValues([ 1.29999983,  1.64518237, -1.20000005,  1.25481772,  -1.60000002,  0.0] )
+# dummy_input = raw_input("Change joints")
+# robot.SetDOFValues([-0.95057231,  1.49078465,  1.22379041,  1.939116,    1.45200026, -0.88941813])
+# dummy_input = raw_input("Change joints")
+# robot.SetDOFValues([-0.95057231,  1.07405365,  1.52847648, -1.09043157, -1.45200026,  2.25217462])
+# dummy_input = raw_input("Change joints")
+# robot.SetDOFValues([ 1.29999983,  0.60194546,  1.5507617,   2.68888545,  1.60000002, -3.1415925 ])
+# dummy_input = raw_input("Change joints")
+# robot.SetDOFValues([ 1.29999983,  0.50000000,  1.20000005, 0.0,  -1.60000002,  0.0])
+# dummy_input = raw_input("Change joints")
+# sys.exit()
 
 
 manip = robot.GetActiveManipulator()
@@ -51,7 +52,7 @@ print "Tee_pose:", Tee_pose
 Tee_np = DHmatrices.pose_to_htm(Tee_pose)
 print "Tee_htm:", Tee_np
 dummy_input = raw_input("Gone to IKmodel?")
-robot.SetDOFValues([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+robot.SetDOFValues([1.57, 0.0, 0.0, 0.7, 0.0, 0.0])
 
 ikmodel=databases.inversekinematics.InverseKinematicsModel(robot,iktype=IkParameterization.Type.Translation3D)
 if not ikmodel.load():
@@ -59,16 +60,14 @@ if not ikmodel.load():
     ikmodel.autogenerate()
 
 print "ikmodel file name:", ikmodel.getfilename(), ikmodel.load()
-dummy_input = raw_input("Go to Tee1?")
+
 
 Tee1 = np.array([[0.00,  1.00,  0.00,  0.817], [1.00,  0.00,  0.00, -0.232], [0.00,  0.00, -1.00,  0.062], [0.00,  0.00,  0.00,  1.00]])
 print Tee1
 ikparam = IkParameterization(Tee[0:3,3], ikmodel.iktype) # build up the translation3d ik query
-sol = self.manip.FindIKSolution(ikparam, IkFilterOptions.CheckEnvCollisions)
+sol = manip.FindIKSolution(ikparam, IkFilterOptions.CheckEnvCollisions)
 robot.SetDOFValues(sol, ikmodel.manip.GetArmIndices())
-dummy_input = raw_input("Done?")
-
-robot.SetDOFValues([0.0, 0.0, 0.0, 0.0, 0.0, 0.0])
+dummy_input = raw_input("Go to Tee1?")
 sys.exit()
 
 

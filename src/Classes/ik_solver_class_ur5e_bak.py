@@ -71,6 +71,8 @@ class IKSolver:
 		print "Filename:", self.ikmodel.getfilename()
 		print "IKname:", self.ikmodel.getikname()
 
+		sys.exit()
+
 		# Set active manipulator bases
 		self.basemanip = interfaces.BaseManipulation(self.robot)
 		self.taskmanip = interfaces.TaskManipulation(self.robot)
@@ -270,6 +272,7 @@ class IKSolver:
 
 		else:
 			print "Unknown ee_type"
+
 
 	def sub_Tee_pose(self, msg):
 		'''

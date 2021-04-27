@@ -29,6 +29,8 @@ from DH_matrices import DHmatrices
 
 sys.path.append("/home/gizem/catkin_ws/src/ik_solver_test/ext-solvers/ur5e_3d/Classes")
 from ik_ur5e_translate_3d import IK_UR5ETRANS3D
+sys.path.append("/home/gizem/catkin_ws/src/ik_solver_test/ext-solvers/ur5e_6d/Classes")
+from ik_ur5e_transform_6d import IK_UR5ETRANSFORM6D
 
 Tee_fail = np.zeros((4,4))
 
@@ -59,10 +61,7 @@ class IKSolver:
 
 		# Set IK model
 		if ikmodel==1:
-			print "Transform6D is not implemented yet"
-			print "See README to create"
-			sys.exit()
-			## Create another solver Transform6D. Initiate here
+			self.iksolver = IK_UR5ETRANSFORM6D
 		elif ikmodel==2:
 			self.iksolver = IK_UR5ETRANS3D()
 		else:
@@ -79,28 +78,29 @@ class IKSolver:
 
 		# Initial poses
 		home = [pi/2, -pi/2., pi/2, pi, -pi/2, 0.0]
+		# self.robot.SetDOFValues(home) 
+		# dummy_input = raw_input("Next?")
+		# home = [pi/2, -pi/2., pi/2, 0.0,0.1,0.]
+		# self.robot.SetDOFValues(home) 
+		# dummy_input = raw_input("Next?")
+		# home = [pi/2, -pi/2., pi/2, 0.0,0.1,0.3]
+		# self.robot.SetDOFValues(home) 
+		# dummy_input = raw_input("Next?")
+		# home = [pi/2, -pi/2., pi/2, 1.0,-0.2,0.]
+		# self.robot.SetDOFValues(home) 
+		# dummy_input = raw_input("Next?")
+		# home = [pi/2, -pi/2., pi/2, -1.4,-0.7,0.]
+		# self.robot.SetDOFValues(home) 
+		# dummy_input = raw_input("Next?")
+		# home = [pi/2, -pi/2., pi/2, -1.4,-1.9,0.]
+		# self.robot.SetDOFValues(home) 
+		# dummy_input = raw_input("Next?")
+		# home = [pi/2, -pi/2., pi/2, -1.4,-2.7,0.]
+		# self.robot.SetDOFValues(home) 
+		# dummy_input = raw_input("Next?")
+		# sys.exit(0)
 		self.robot.SetDOFValues(home) 
 		dummy_input = raw_input("Next?")
-		home = [pi/2, -pi/2., pi/2, 0.0,0.1,0.]
-		self.robot.SetDOFValues(home) 
-		dummy_input = raw_input("Next?")
-		home = [pi/2, -pi/2., pi/2, 0.0,0.1,0.3]
-		self.robot.SetDOFValues(home) 
-		dummy_input = raw_input("Next?")
-		home = [pi/2, -pi/2., pi/2, 1.0,-0.2,0.]
-		self.robot.SetDOFValues(home) 
-		dummy_input = raw_input("Next?")
-		home = [pi/2, -pi/2., pi/2, -1.4,-0.7,0.]
-		self.robot.SetDOFValues(home) 
-		dummy_input = raw_input("Next?")
-		home = [pi/2, -pi/2., pi/2, -1.4,-1.9,0.]
-		self.robot.SetDOFValues(home) 
-		dummy_input = raw_input("Next?")
-		home = [pi/2, -pi/2., pi/2, -1.4,-2.7,0.]
-		self.robot.SetDOFValues(home) 
-		dummy_input = raw_input("Next?")
-		sys.exit(0)
-		self.robot.SetDOFValues(home) 
 		Tee_home = np.asarray(self.manip.GetEndEffectorTransform())
 		print "Tee_home:", self.manip.GetEndEffectorTransform() # get end effector
 

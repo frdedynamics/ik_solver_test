@@ -6,7 +6,7 @@
 
 # """
 import rospy
-from Classes.ik_solver_class_ur5e import IKSolver
+from Classes.ik_solver_class_ur5e_bak import IKSolver
 from geometry_msgs.msg import Vector3
 
 if __name__ == "__main__":

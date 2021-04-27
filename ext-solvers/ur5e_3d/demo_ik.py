@@ -38,7 +38,7 @@ ee_pose_test2 = np.array([[ 1., 0., 0., 0.1000000],
 # Test inverse kinematics: get joint angles from end effector pose
 print("\nTesting inverse kinematics:\n")
 # joint_configs = ur5_kin.inverse(null_ee.reshape(-1).tolist())
-joint_configs = ur5_kin.inverse(ee_pose_test2.reshape(-1).tolist())
+joint_configs = ur5_kin.inverse(ee_pose_test.reshape(-1).tolist())
 # joint_configs = ur5_kin.inverse(ee_pose)
 n_solutions = int(len(joint_configs)/n_joints)
 print("%d solutions found:"%(n_solutions))
