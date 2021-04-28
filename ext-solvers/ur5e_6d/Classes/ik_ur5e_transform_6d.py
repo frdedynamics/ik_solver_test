@@ -42,12 +42,20 @@ class IK_UR5ETRANSFORM6D:
     def calc_inverse_kin(self, ee_coord):
         '''
         Given coordinates ee as a list, return all possible joint angles
-        @params: ee_coord=[x, y, z, theta1, theta2, theta3]
+        @params: ee_coord=(3,4) np.ndarray
         @returns: joint_angles=[j1, j2, j3, j4, j5, j6]
         '''
         print("\nComputing inverse kinematics:\n")
+        print type(ee_coord)
+        if(ee_coord.shape == (4,4)):
+            ee = ee_coord[:3,:]
+        elif(ee_coord.shape == (3,4)):
+            ee = ee_coord
+        else:
+            raise AssertionError("Wrong type of ee. Expected (3,4) or (4,4) np.ndarray")
+
         try:
-            self.joint_configs = self.kinematics.inverse(ee_coord.reshape(-1).tolist())
+            self.joint_configs = self.kinematics.inverse(ee.reshape(-1).tolist())
             self.n_solutions = int(len(self.joint_configs)/self.n_joints)
             # print("%d solutions found:"%(n_solutions))
             self.joint_configs = np.asarray(self.joint_configs).reshape(self.n_solutions,self.n_joints)

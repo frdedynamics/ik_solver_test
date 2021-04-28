@@ -62,18 +62,6 @@ class IKSolver:
 		# Set IK model
 		if ikmodel==1:
 			self.iksolver = IK_UR5ETRANSFORM6D()
-			ee = self.iksolver.calc_forward_kin([0.1,-0.75,0.2,1.5,-0.6,0.])
-			print ee
-			ee_pose_test = np.array([[ 0.35469353199005127, -0.5184540748596191, -0.7780731916427612, 0.5204400420188904],
-                    [ 0.8253356218338013, 0.5646424889564514, 0.0, 0.0812000036239624],
-                    [ 0.4393332004547119, -0.6421715021133423, 0.6281736493110657, -0.33196911215782166]])
-
-			ur_wrist_joints_all = self.iksolver.calc_inverse_kin(ee_pose_test)
-			n_solutions = int(len(ur_wrist_joints_all)/6)
-			print("%d solutions found:"%(n_solutions))
-			sys.exit()
-					
-
 		elif ikmodel==2:
 			self.iksolver = IK_UR5ETRANS3D()
 		else:
@@ -112,7 +100,7 @@ class IKSolver:
 		# dummy_input = raw_input("Next?")
 		# sys.exit(0)
 		self.robot.SetDOFValues(home) 
-		dummy_input = raw_input("Next?")
+		# dummy_input = raw_input("Next?")
 		Tee_home = np.asarray(self.manip.GetEndEffectorTransform())
 		print "Tee_home:", self.manip.GetEndEffectorTransform() # get end effector
 
@@ -197,7 +185,7 @@ class IKSolver:
 				tpose = [0.1, 0.22650042, 0.00998334]
 
 				try: 
-					ur_wrist_joints_all = self.iksolver.calc_inverse_kin(self.Tee_goal[0:3,3].tolist())
+					ur_wrist_joints_all = self.iksolver.calc_inverse_kin(self.Tee_goal.reshape(-1).tolist())
 					# ur_wrist_joints_all = self.iksolver.calc_inverse_kin(tpose)
 					if self.iksolver.n_solutions > 0:
 						ur_wrist_joints = self.iksolver.choose_closest_soln(self.joint_states.position[3:])
@@ -232,28 +220,33 @@ class IKSolver:
 			if not comparison.all():
 				print "Tee_goal:", self.Tee_goal[0:3,3]
 
+				# ee = self.iksolver.calc_forward_kin([0.1,-0.75,0.2,1.5,-0.6,0.])
+				ee_pose_test = np.array([[ 0.35469353199005127, -0.5184540748596191, -0.7780731916427612, 0.5204400420188904],
+                    [ 0.8253356218338013, 0.5646424889564514, 0.0, 0.0812000036239624],
+                    [ 0.4393332004547119, -0.6421715021133423, 0.6281736493110657, -0.33196911215782166]])
 
 				try: 
-					ur_wrist_joints_all = self.iksolver.calc_inverse_kin(self.Tee_goal.reshape(-1).tolist())
-					# ur_wrist_joints_all = self.iksolver.calc_inverse_kin(tpose)
+					# ur_wrist_joints_all = self.iksolver.calc_inverse_kin(self.Tee_goal[0:3,3].tolist())
+					ur_joints_all = self.iksolver.calc_inverse_kin(ee_pose_test)
 					if self.iksolver.n_solutions > 0:
-						ur_wrist_joints = self.iksolver.choose_closest_soln(self.joint_states.position[3:])
-						print "calculated joints:", ur_wrist_joints
-						self.joint_states.position[3] = ur_wrist_joints[0]
-						self.joint_states.position[4] = ur_wrist_joints[1]
-						self.joint_states.position[5] = ur_wrist_joints[2]
+						ur_selected_joints = self.iksolver.choose_closest_soln(self.joint_states.position)
+						print "calculated joints:", ur_selected_joints
+						self.joint_states.position[0] = ur_selected_joints[0]
+						self.joint_states.position[1] = ur_selected_joints[1]
+						self.joint_states.position[2] = ur_selected_joints[2]
+						self.joint_states.position[3] = ur_selected_joints[3]
+						self.joint_states.position[4] = ur_selected_joints[4]
+						self.joint_states.position[5] = ur_selected_joints[5]
 					else:
 						Tee_fail = self.Tee_goal
-						# raise openrave_exception("No solution")
+						raise openrave_exception("No solution")
 				except openrave_exception, e:
 					print e
 				# print "Tee_goal:", self.Tee_goal
 				# print "joint positions:", self.joint_states.position
 			else:
-				# print "The same invalid Tee"
+				print "The same invalid Tee"
 				pass
-
-
 		else:
 			print "Unknown ee_type"
 	
