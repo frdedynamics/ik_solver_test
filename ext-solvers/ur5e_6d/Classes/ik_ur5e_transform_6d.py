@@ -13,10 +13,12 @@ sys.path.append("/home/gizem/catkin_ws/src/ik_solver_test/ext-solvers/ur5e_6d")
 import ikfastpy
 
 
+
 class IK_UR5ETRANSFORM6D:
     def __init__(self):
         self.kinematics = ikfastpy.PyKinematics()
         self.n_joints = self.kinematics.getDOF()
+        print "# of joints:", self.n_joints
         self.joint_angles = [0.1,-0.75,0.2,1.5,-0.6,0.] # in radians
         self.joint_configs = []
         self.n_solutions = 0

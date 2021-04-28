@@ -27,8 +27,8 @@ robot_path = os.path.join(robot_dir, robot_name)
 sys.path.append("/home/gizem/catkin_ws/src/ur5_with_hand_gazebo/src/Classes")
 from DH_matrices import DHmatrices
 
-sys.path.append("/home/gizem/catkin_ws/src/ik_solver_test/ext-solvers/ur5e_3d/Classes")
-from ik_ur5e_translate_3d import IK_UR5ETRANS3D
+# sys.path.append("/home/gizem/catkin_ws/src/ik_solver_test/ext-solvers/ur5e_3d/Classes")
+# from ik_ur5e_translate_3d import IK_UR5ETRANS3D
 sys.path.append("/home/gizem/catkin_ws/src/ik_solver_test/ext-solvers/ur5e_6d/Classes")
 from ik_ur5e_transform_6d import IK_UR5ETRANSFORM6D
 
@@ -36,7 +36,7 @@ Tee_fail = np.zeros((4,4))
 
 
 class IKSolver:
-	def __init__(self, ikmodel=2, START_NODE=False, rate=100):
+	def __init__(self, ikmodel=1, START_NODE=False, rate=100):
 		''' Initializes the openrave environment, robot state and IK model
 		@params ikmodel: 1->Transform6D 2->Translation3D
 		'''
@@ -61,7 +61,21 @@ class IKSolver:
 
 		# Set IK model
 		if ikmodel==1:
-			self.iksolver = IK_UR5ETRANSFORM6D
+			self.iksolver = IK_UR5ETRANSFORM6D()
+			ee = self.iksolver.calc_forward_kin([0.1,-0.75,0.2,1.5,-0.6,0.])
+			print ee
+			dummy = raw_input("Next")
+			ee_pose_test = np.array([[ 0.35469353199005127, -0.5184540748596191, -0.7780731916427612, 0.5204400420188904],
+                    [ 0.8253356218338013, 0.5646424889564514, 0.0, 0.0812000036239624],
+                    [ 0.4393332004547119, -0.6421715021133423, 0.6281736493110657, -0.33196911215782166],
+					0.0, 0.0, 0.0, 1.0])
+
+			ur_wrist_joints_all = self.iksolver.calc_inverse_kin(ee_pose_test.reshape(-1).tolist())
+			n_solutions = int(len(ur_wrist_joints_all)/6)
+			print("%d solutions found:"%(n_solutions))
+			sys.exit()
+					
+
 		elif ikmodel==2:
 			self.iksolver = IK_UR5ETRANS3D()
 		else:
@@ -140,12 +154,15 @@ class IKSolver:
 		self.pub_calculated_tee = rospy.Publisher('/Tee_calculated', Pose, queue_size=1) # For debug purposes
 		# self.pub_test = rospy.Publisher('/test_msg', Vector3, queue_size=1) #
 
-		self.sub_Tee_pose = rospy.Subscriber('/Tee_mapper_goal_pose', Pose, self.sub_Tee_pose)
+		self.sub_Tee_pose = rospy.Subscriber('/Tee_goal_pose', Pose, self.sub_Tee_pose)
 		self.sub_test_joint = rospy.Subscriber('/test_joints', JointState, self.sub_test_joint)
 		# self.sub_selector = rospy.Subscriber('/selector', Int8, self.sub_selector)
 		# self.log_start_time = rospy.get_time()
 		_ROSTIME_START = rospy.get_time()
 		print "ik_solver_node pub/sub initialized"
+
+		ee_pose_test2 = np.array([[0.35469, -0.51845, -0.77807, 0.520], [0.82533, 0.56464, 0.0, 0.081], [0.43933, -0.64217, 0.62817, -0.332], [0.00,  0.00,  0.00,  1.00]])
+		print "Goal:", DHmatrices.htm_to_pose(ee_pose_test2)
 
 
 	def update(self):
@@ -154,7 +171,7 @@ class IKSolver:
 
 		# CALCULATE JOINT ANGLES AND PUBLISH BASED ON WHAT \human_robot_mapper SENT
 		# self.Tee_goal = np.array([[0.00,  1.00,  0.00,  0.817], [1.00,  0.00,  0.00, -0.232], [0.00,  0.00, -1.00,  0.062], [0.00,  0.00,  0.00,  1.00]])
-		self.calculate_joint_angles()
+		self.calculate_joint_angles_fullarm()
 		self.joint_states.header.stamp = rospy.Time.now()
 		self.pub.publish(self.joint_states)
 
@@ -168,7 +185,7 @@ class IKSolver:
 		# print "Tee:", self.Tee_current
 			
 
-	def calculate_joint_angles(self):
+	def calculate_joint_angles_wrist(self):
 		'''
 		Given ee_goal, calculate joint angles. Do I need to pull ee_goal?
 		@params ee_goal: type np.array(4x4) HTM
@@ -183,6 +200,43 @@ class IKSolver:
 
 				try: 
 					ur_wrist_joints_all = self.iksolver.calc_inverse_kin(self.Tee_goal[0:3,3].tolist())
+					# ur_wrist_joints_all = self.iksolver.calc_inverse_kin(tpose)
+					if self.iksolver.n_solutions > 0:
+						ur_wrist_joints = self.iksolver.choose_closest_soln(self.joint_states.position[3:])
+						print "calculated joints:", ur_wrist_joints
+						self.joint_states.position[3] = ur_wrist_joints[0]
+						self.joint_states.position[4] = ur_wrist_joints[1]
+						self.joint_states.position[5] = ur_wrist_joints[2]
+					else:
+						Tee_fail = self.Tee_goal
+						# raise openrave_exception("No solution")
+				except openrave_exception, e:
+					print e
+				# print "Tee_goal:", self.Tee_goal
+				# print "joint positions:", self.joint_states.position
+			else:
+				# print "The same invalid Tee"
+				pass
+
+
+		else:
+			print "Unknown ee_type"
+
+
+	def calculate_joint_angles_fullarm(self):
+		'''
+		Given ee_goal, calculate joint angles. Do I need to pull ee_goal?
+		@params ee_goal: type np.array(4x4) HTM
+		'''
+		global Tee_fail
+		if (type(self.Tee_goal)==np.ndarray) and (self.Tee_goal.shape == (4,4)):
+			comparison = self.Tee_goal == Tee_fail
+			if not comparison.all():
+				print "Tee_goal:", self.Tee_goal[0:3,3]
+
+
+				try: 
+					ur_wrist_joints_all = self.iksolver.calc_inverse_kin(self.Tee_goal.reshape(-1).tolist())
 					# ur_wrist_joints_all = self.iksolver.calc_inverse_kin(tpose)
 					if self.iksolver.n_solutions > 0:
 						ur_wrist_joints = self.iksolver.choose_closest_soln(self.joint_states.position[3:])

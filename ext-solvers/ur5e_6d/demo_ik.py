@@ -4,6 +4,8 @@ from math import pi, sqrt
 import sys
 from geometry_msgs.msg import Pose, Point, Quaternion
 
+print sys.path
+
 # Initialize kinematics for UR5 robot arm
 ur5_kin = ikfastpy.PyKinematics()
 n_joints = ur5_kin.getDOF()

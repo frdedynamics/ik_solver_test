@@ -62,7 +62,7 @@ The API calls are slightly different for versions > 54
 */
 
 #define IK_VERSION 61
-#include "ikfast61p4.cpp"
+#include "ikfast61.cpp"
 
 //#define IK_VERSION 56
 //#include "ikfast56.Transform6D.0_1_2_3_4_5.cpp"
