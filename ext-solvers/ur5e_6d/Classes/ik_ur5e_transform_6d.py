@@ -30,8 +30,8 @@ class IK_UR5ETRANSFORM6D:
     def calc_forward_kin(self, joint_angles):
         '''
         Given list of joint angles in radians, return ee coordinates
-        @params: joint_angles=[j1, j2, j3]
-        @returns: ee=[x, y, z]
+        @params: joint_angles=[j1, j2, j3, j4, j5, j6]
+        @returns: ee=[x, y, z, theta1, theta2, theta3]
         '''
         print("\nComputing forward kinematics:\n")
         self.ee_pose = self.kinematics.forward(joint_angles)
@@ -42,15 +42,12 @@ class IK_UR5ETRANSFORM6D:
     def calc_inverse_kin(self, ee_coord):
         '''
         Given coordinates ee as a list, return all possible joint angles
-        @params: ee_coord=[x, y, z]
-        @returns: joint_angles=[j1, j2, j3]
+        @params: ee_coord=[x, y, z, theta1, theta2, theta3]
+        @returns: joint_angles=[j1, j2, j3, j4, j5, j6]
         '''
         print("\nComputing inverse kinematics:\n")
-        ee_trans = [0., 0., 0., ee_coord[0],
-                    0., 0., 0., ee_coord[1],
-                    0., 0., 0., ee_coord[2]]
         try:
-            self.joint_configs = self.kinematics.inverse(ee_trans)
+            self.joint_configs = self.kinematics.inverse(ee_coord.reshape(-1).tolist())
             self.n_solutions = int(len(self.joint_configs)/self.n_joints)
             # print("%d solutions found:"%(n_solutions))
             self.joint_configs = np.asarray(self.joint_configs).reshape(self.n_solutions,self.n_joints)

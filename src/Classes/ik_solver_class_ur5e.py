@@ -64,13 +64,11 @@ class IKSolver:
 			self.iksolver = IK_UR5ETRANSFORM6D()
 			ee = self.iksolver.calc_forward_kin([0.1,-0.75,0.2,1.5,-0.6,0.])
 			print ee
-			dummy = raw_input("Next")
 			ee_pose_test = np.array([[ 0.35469353199005127, -0.5184540748596191, -0.7780731916427612, 0.5204400420188904],
                     [ 0.8253356218338013, 0.5646424889564514, 0.0, 0.0812000036239624],
-                    [ 0.4393332004547119, -0.6421715021133423, 0.6281736493110657, -0.33196911215782166],
-					0.0, 0.0, 0.0, 1.0])
+                    [ 0.4393332004547119, -0.6421715021133423, 0.6281736493110657, -0.33196911215782166]])
 
-			ur_wrist_joints_all = self.iksolver.calc_inverse_kin(ee_pose_test.reshape(-1).tolist())
+			ur_wrist_joints_all = self.iksolver.calc_inverse_kin(ee_pose_test)
 			n_solutions = int(len(ur_wrist_joints_all)/6)
 			print("%d solutions found:"%(n_solutions))
 			sys.exit()
