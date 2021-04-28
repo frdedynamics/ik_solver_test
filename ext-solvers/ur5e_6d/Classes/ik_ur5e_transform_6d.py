@@ -45,8 +45,7 @@ class IK_UR5ETRANSFORM6D:
         @params: ee_coord=(3,4) np.ndarray
         @returns: joint_angles=[j1, j2, j3, j4, j5, j6]
         '''
-        print("\nComputing inverse kinematics:\n")
-        print type(ee_coord)
+        # print("\nComputing inverse kinematics:\n")
         if(ee_coord.shape == (4,4)):
             ee = ee_coord[:3,:]
         elif(ee_coord.shape == (3,4)):

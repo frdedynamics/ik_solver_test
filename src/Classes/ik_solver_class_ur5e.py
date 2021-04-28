@@ -218,16 +218,15 @@ class IKSolver:
 		if (type(self.Tee_goal)==np.ndarray) and (self.Tee_goal.shape == (4,4)):
 			comparison = self.Tee_goal == Tee_fail
 			if not comparison.all():
-				print "Tee_goal:", self.Tee_goal[0:3,3]
-
+				# print "Tee_goal:", self.Tee_goal
 				# ee = self.iksolver.calc_forward_kin([0.1,-0.75,0.2,1.5,-0.6,0.])
 				ee_pose_test = np.array([[ 0.35469353199005127, -0.5184540748596191, -0.7780731916427612, 0.5204400420188904],
                     [ 0.8253356218338013, 0.5646424889564514, 0.0, 0.0812000036239624],
                     [ 0.4393332004547119, -0.6421715021133423, 0.6281736493110657, -0.33196911215782166]])
 
 				try: 
-					# ur_wrist_joints_all = self.iksolver.calc_inverse_kin(self.Tee_goal[0:3,3].tolist())
-					ur_joints_all = self.iksolver.calc_inverse_kin(ee_pose_test)
+					ur_wrist_joints_all = self.iksolver.calc_inverse_kin(self.Tee_goal)
+					# ur_joints_all = self.iksolver.calc_inverse_kin(ee_pose_test)
 					if self.iksolver.n_solutions > 0:
 						ur_selected_joints = self.iksolver.choose_closest_soln(self.joint_states.position)
 						print "calculated joints:", ur_selected_joints
@@ -237,13 +236,12 @@ class IKSolver:
 						self.joint_states.position[3] = ur_selected_joints[3]
 						self.joint_states.position[4] = ur_selected_joints[4]
 						self.joint_states.position[5] = ur_selected_joints[5]
+						self.robot.SetDOFValues(self.joint_states.position)
 					else:
 						Tee_fail = self.Tee_goal
 						raise openrave_exception("No solution")
 				except openrave_exception, e:
 					print e
-				# print "Tee_goal:", self.Tee_goal
-				# print "joint positions:", self.joint_states.position
 			else:
 				print "The same invalid Tee"
 				pass
