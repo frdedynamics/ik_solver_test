@@ -10,7 +10,7 @@ from Classes.ik_solver_class_ur5e import IKSolver
 from geometry_msgs.msg import Vector3
 
 if __name__ == "__main__":
-	iksolver = IKSolver(START_NODE=True, rate=100)
+	iksolver = IKSolver(START_NODE=True, rate=10)
 	iksolver.init_subscribers_and_publishers()
 	start_time = rospy.Time.now()
 	rate = rospy.Rate(50)

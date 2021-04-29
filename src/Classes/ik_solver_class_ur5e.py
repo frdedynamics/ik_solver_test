@@ -77,7 +77,7 @@ class IKSolver:
 
 
 		# Initial poses
-		home = [pi/2, -pi/2., pi/2, pi, -pi/2, 0.0]
+		home = [pi/2, -pi/2, 0.0, pi, -pi/2, 0.0]
 		# self.robot.SetDOFValues(home) 
 		# dummy_input = raw_input("Next?")
 		# home = [pi/2, -pi/2., pi/2, 0.0,0.1,0.]
@@ -212,7 +212,7 @@ class IKSolver:
 	def calculate_joint_angles_fullarm(self):
 		'''
 		Given ee_goal, calculate joint angles. Do I need to pull ee_goal?
-		@params ee_goal: type np.array(4x4) HTM
+		@params ee_goal: type np.array(4x4) HTM  (or self.Tee_goal)
 		'''
 		global Tee_fail
 		if (type(self.Tee_goal)==np.ndarray) and (self.Tee_goal.shape == (4,4)):
@@ -220,15 +220,17 @@ class IKSolver:
 			if not comparison.all():
 				# print "Tee_goal:", self.Tee_goal
 				# ee = self.iksolver.calc_forward_kin([0.1,-0.75,0.2,1.5,-0.6,0.])
-				ee_pose_test = np.array([[ 0.35469353199005127, -0.5184540748596191, -0.7780731916427612, 0.5204400420188904],
-                    [ 0.8253356218338013, 0.5646424889564514, 0.0, 0.0812000036239624],
-                    [ 0.4393332004547119, -0.6421715021133423, 0.6281736493110657, -0.33196911215782166]])
+				# ee_pose_test = np.array([[ 0.35469353199005127, -0.5184540748596191, -0.7780731916427612, 0.5204400420188904],
+                #     [ 0.8253356218338013, 0.5646424889564514, 0.0, 0.0812000036239624],
+                #     [ 0.4393332004547119, -0.6421715021133423, 0.6281736493110657, -0.33196911215782166]])
 
 				try: 
 					ur_wrist_joints_all = self.iksolver.calc_inverse_kin(self.Tee_goal)
 					# ur_joints_all = self.iksolver.calc_inverse_kin(ee_pose_test)
 					if self.iksolver.n_solutions > 0:
 						ur_selected_joints = self.iksolver.choose_closest_soln(self.joint_states.position)
+						
+						print "# of solutions:", self.iksolver.n_solutions
 						print "calculated joints:", ur_selected_joints
 						self.joint_states.position[0] = ur_selected_joints[0]
 						self.joint_states.position[1] = ur_selected_joints[1]
@@ -243,12 +245,11 @@ class IKSolver:
 				except openrave_exception, e:
 					print e
 			else:
-				print "The same invalid Tee"
-				pass
+				print "The same invalid Tee", self.Tee_goal
+				
 		else:
 			print "Unknown ee_type"
 	
-
 
 	def sub_Tee_pose(self, msg):
 		'''
@@ -258,14 +259,15 @@ class IKSolver:
 		# print "Tee_goal_pose:", Tee_goal_pose
 		mag = sqrt((Tee_goal_pose.position.x**2) + (Tee_goal_pose.position.y**2) + (Tee_goal_pose.position.z**2))
 		self.Tee_goal = DHmatrices.pose_to_htm(Tee_goal_pose)
-		
-		
+
+
 	def sub_test_joint(self, msg):
 		'''
 		Subscribes Tee_pose {Pose()}, converts it to Tee {np.array()}
 		'''
 		self.test_joints.position = list(msg.position)
 		
+
 	def sub_selector(self, msg):
 		'''
 		This is only for test purpose 
