@@ -77,7 +77,7 @@ class IKSolver:
 
 
 		# Initial poses
-		home = [pi/2, -pi/2, 0.0, pi, -pi/2, 0.0]
+		home = [0.0, -pi/2, pi/2, pi, -pi/2, 0.0]
 		# self.robot.SetDOFValues(home) 
 		# dummy_input = raw_input("Next?")
 		# home = [pi/2, -pi/2., pi/2, 0.0,0.1,0.]
@@ -111,7 +111,7 @@ class IKSolver:
 		# Updated parameters
 		self.joint_states = JointState()
 		## TODO: parametrize such that robot.GetJointNames()
-		self.joint_states.name = ['shoulder_pan_joint', 'shoulder_lift_joint', 'elbow_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
+		self.joint_states.name = ['elbow_joint', 'shoulder_lift_joint', 'shoulder_pan_joint', 'wrist_1_joint', 'wrist_2_joint', 'wrist_3_joint']
 		self.joint_states.position = home
 		
 		# self.test_joints = JointState()
@@ -164,6 +164,7 @@ class IKSolver:
 		# CALCULATE TEE POSE IN OPENRV -- DEBUD PURPOSE
 		self.Tee_current = self.manip.GetEndEffectorTransform()
 		self.Tee_current_pose = DHmatrices.htm_to_pose(self.Tee_current)
+		print "Tee_current_pose:", self.Tee_current_pose
 		self.pub_calculated_tee.publish(self.Tee_current_pose)
 		
 		# print "self.test_joints.position", self.test_joints.position
