@@ -24,6 +24,8 @@ class IK_UR5ETRANSFORM6D:
         self.n_solutions = 0
         self.ee_pose = [0.] * 12
         self.ee_coord = [0., 0., 0.]  # update initial with a valid
+        self.closest_soln = []
+
         print "Initialized"
 
 
@@ -66,8 +68,92 @@ class IK_UR5ETRANSFORM6D:
             print e
     
 
-    def choose_closest_soln(self, current_angles):
+    def choose_closest_soln(self, current_angles, restricted=False):
         diff = []
+        print "joint_configs:", self.joint_configs
         for joint_config in self.joint_configs:
+            print "1-joint_config, current_angles", joint_config, current_angles
             diff.append(mse(joint_config, current_angles))
-        return self.joint_configs[diff.index(min(diff))]
+        closest_soln_index = diff.index(min(diff))
+        self.closest_soln = self.joint_configs[closest_soln_index]
+        print "closest:", self.closest_soln
+        if restricted:
+            changed = self.eliminate_jumps(current_angles, self.closest_soln, closest_soln_index)
+            while changed:  # which means there is a jump on the base joint
+                for joint_config in self.joint_configs:
+                    print "2-joint_config, current_angles", joint_config, current_angles
+                    diff.append(mse(joint_config, current_angles))
+                self.closest_soln = self.joint_configs[diff.index(min(diff))]
+                print changed
+            
+
+        else:
+            return self.closest_soln
+
+    
+    def eliminate_jumps(self, current_angles, closest_soln, closest_soln_index):
+        if self.n_solutions == 1:
+                print "Only one (1) possible solution returned"
+                changed = False
+        else:
+            print "n of sols:", self.n_solutions
+            print "curr:", current_angles[0]
+            print "closest:", closest_soln[0]
+            diff_base = current_angles[0]-closest_soln[0]
+            print "diff_base:", diff_base
+            if abs(diff_base) > 0.707:
+                self.joint_configs = np.delete(self.joint_configs, closest_soln_index)
+                print "after n of sols:", int(len(self.joint_configs)/self.n_joints)
+                print "Removed soln:", closest_soln
+                print "Current angles:", current_angles
+                self.n_solutions = self.n_solutions -1
+                changed = True
+            else:
+                changed = False
+        return changed
+
+    # def eliminate_jumps(self, current_angles, closest_soln, closest_soln_index):
+    #     while self.n_solutions > 0:
+    #         if (current_angles[0]-closest_soln[0]) > pi/3:
+    #             self.joint_configs.delete(closest_soln_index)
+    #             print "Removed soln:", closest_soln
+    #             self.n_solutions = self.n_solutions -1
+    #             if self.n_solutions == 1:
+    #                 print "Only one (1) possible solution returned"
+    #                 changed = False
+    #             else:
+    #                 changed = True
+    #         else:
+    #             changed = False
+    #     return changed
+
+    
+    def apply_joint_limits(self, current_angles, **kwargs):
+        ''' Manually apply joint limits LATER
+            Call this function like: iksolverwhatever.apply_joint_limits(shoulder_pan=angle_x, shoulder_lift=angle_y, wrist_3=angle_z)'''
+        for joint, theta in kwargs.items():
+            joint_int = IK_UR5ETRANSFORM6D.joint_names_to_numbers(joint)
+            if joint_int == 0:
+                pass
+            elif joint_int == 1:
+                pass
+            else:
+                sys.exit("Unknown joint name or limit")
+
+
+    @staticmethod
+    def joint_names_to_numbers(argument): 
+        switcher = { 
+            "shoulder_pan": 0, 
+            "shoulder_lift": 1,
+            "elbow": 2,
+            "wrist_1": 3,
+            "wrist_2": 4,
+            "wrist_3": 5,
+        }
+        # get() method of dictionary data type returns  
+        # value of passed argument if it is present  
+        # in dictionary otherwise second argument will 
+        # be assigned as default value of passed argument 
+        return switcher.get(argument, "nothing")
+

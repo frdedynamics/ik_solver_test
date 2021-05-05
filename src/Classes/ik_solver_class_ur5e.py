@@ -77,7 +77,7 @@ class IKSolver:
 
 
 		# Initial poses
-		home = [0.0, -pi/2, pi/2, pi, -pi/2, 0.0]
+		home = [pi/2, -pi/2, pi/2, pi, -pi/2, 0.0]
 		# self.robot.SetDOFValues(home) 
 		# dummy_input = raw_input("Next?")
 		# home = [pi/2, -pi/2., pi/2, 0.0,0.1,0.]
@@ -233,6 +233,7 @@ class IKSolver:
 						
 						print "# of solutions:", self.iksolver.n_solutions
 						print "calculated joints:", ur_selected_joints
+						print "joint_states.position:", self.joint_states.position
 						self.joint_states.position[0] = ur_selected_joints[0]
 						self.joint_states.position[1] = ur_selected_joints[1]
 						self.joint_states.position[2] = ur_selected_joints[2]
