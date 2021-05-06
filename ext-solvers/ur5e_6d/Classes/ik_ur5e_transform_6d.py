@@ -68,47 +68,39 @@ class IK_UR5ETRANSFORM6D:
             print e
     
 
-    def choose_closest_soln(self, current_angles, restricted=False):
+    def choose_closest_soln(self, current_angles, restricted=True):
         diff = []
-        print "joint_configs:", self.joint_configs
         for joint_config in self.joint_configs:
-            print "1-joint_config, current_angles", joint_config, current_angles
             diff.append(mse(joint_config, current_angles))
         closest_soln_index = diff.index(min(diff))
         self.closest_soln = self.joint_configs[closest_soln_index]
         print "closest:", self.closest_soln
         if restricted:
             changed = self.eliminate_jumps(current_angles, self.closest_soln, closest_soln_index)
+            print "here", changed
             while changed:  # which means there is a jump on the base joint
-                for joint_config in self.joint_configs:
-                    print "2-joint_config, current_angles", joint_config, current_angles
-                    diff.append(mse(joint_config, current_angles))
-                self.closest_soln = self.joint_configs[diff.index(min(diff))]
-                print changed
-            
-
+                self.choose_closest_soln(current_angles, restricted=restricted)
+                changed = self.eliminate_jumps(current_angles, self.closest_soln, closest_soln_index)
         else:
-            return self.closest_soln
+            pass
+        return self.closest_soln
 
-    
+
     def eliminate_jumps(self, current_angles, closest_soln, closest_soln_index):
         if self.n_solutions == 1:
                 print "Only one (1) possible solution returned"
                 changed = False
         else:
-            print "n of sols:", self.n_solutions
-            print "curr:", current_angles[0]
-            print "closest:", closest_soln[0]
             diff_base = current_angles[0]-closest_soln[0]
             print "diff_base:", diff_base
             if abs(diff_base) > 0.707:
-                self.joint_configs = np.delete(self.joint_configs, closest_soln_index)
-                print "after n of sols:", int(len(self.joint_configs)/self.n_joints)
+                self.joint_configs = np.delete(self.joint_configs, closest_soln_index, 0)
                 print "Removed soln:", closest_soln
                 print "Current angles:", current_angles
                 self.n_solutions = self.n_solutions -1
                 changed = True
             else:
+                print "No need to chose new soln"
                 changed = False
         return changed
 
