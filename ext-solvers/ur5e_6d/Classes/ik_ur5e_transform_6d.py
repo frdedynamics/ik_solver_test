@@ -75,9 +75,9 @@ class IK_UR5ETRANSFORM6D:
         closest_soln_index = diff.index(min(diff))
         self.closest_soln = self.joint_configs[closest_soln_index]
         print "closest:", self.closest_soln
+        print "current:", current_angles
         if restricted:
             changed = self.eliminate_jumps(current_angles, self.closest_soln, closest_soln_index)
-            print "here", changed
             while changed:  # which means there is a jump on the base joint
                 self.choose_closest_soln(current_angles, restricted=restricted)
                 changed = self.eliminate_jumps(current_angles, self.closest_soln, closest_soln_index)
@@ -87,37 +87,32 @@ class IK_UR5ETRANSFORM6D:
 
 
     def eliminate_jumps(self, current_angles, closest_soln, closest_soln_index):
-        if self.n_solutions == 1:
-                print "Only one (1) possible solution returned"
+        try:
+            print "self.n_solutions:", self.n_solutions
+            if not self.n_solutions > 1:
                 changed = False
-        else:
-            diff_base = current_angles[0]-closest_soln[0]
-            print "diff_base:", diff_base
-            if abs(diff_base) > 0.707:
-                self.joint_configs = np.delete(self.joint_configs, closest_soln_index, 0)
-                print "Removed soln:", closest_soln
-                print "Current angles:", current_angles
-                self.n_solutions = self.n_solutions -1
-                changed = True
+                raise AssertionError("All solutions removed")
+                sys.exit()
             else:
-                print "No need to chose new soln"
-                changed = False
-        return changed
+                diff_base = np.ones(3)
+                for i in range(3):
+                    diff_base[i] = abs(current_angles[i]-closest_soln[i])
+                    diff_base[i] = True if diff_base[i] > 0.707 else False
+                # diff_base = current_angles[1]-closest_soln[1]
+                print "diff_base:", diff_base
+                if np.any(diff_base):
+                    self.joint_configs = np.delete(self.joint_configs, closest_soln_index, 0)
+                    print "Removed soln:", closest_soln
+                    # print "Current angles:", current_angles
+                    self.n_solutions = self.n_solutions -1
+                    changed = True
+                else:
+                    print "No need to chose new soln"
+                    changed = False
+            return changed
+        except AssertionError as e:
+            print e
 
-    # def eliminate_jumps(self, current_angles, closest_soln, closest_soln_index):
-    #     while self.n_solutions > 0:
-    #         if (current_angles[0]-closest_soln[0]) > pi/3:
-    #             self.joint_configs.delete(closest_soln_index)
-    #             print "Removed soln:", closest_soln
-    #             self.n_solutions = self.n_solutions -1
-    #             if self.n_solutions == 1:
-    #                 print "Only one (1) possible solution returned"
-    #                 changed = False
-    #             else:
-    #                 changed = True
-    #         else:
-    #             changed = False
-    #     return changed
 
     
     def apply_joint_limits(self, current_angles, **kwargs):

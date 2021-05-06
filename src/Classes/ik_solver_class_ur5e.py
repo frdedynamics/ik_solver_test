@@ -164,7 +164,7 @@ class IKSolver:
 		# CALCULATE TEE POSE IN OPENRV -- DEBUD PURPOSE
 		self.Tee_current = self.manip.GetEndEffectorTransform()
 		self.Tee_current_pose = DHmatrices.htm_to_pose(self.Tee_current)
-		print "Tee_current_pose:", self.Tee_current_pose
+		# print "Tee_current_pose:", self.Tee_current_pose
 		self.pub_calculated_tee.publish(self.Tee_current_pose)
 		
 		# print "self.test_joints.position", self.test_joints.position
@@ -181,7 +181,7 @@ class IKSolver:
 		if (type(self.Tee_goal)==np.ndarray) and (self.Tee_goal.shape == (4,4)):
 			comparison = self.Tee_goal == Tee_fail
 			if not comparison.all():
-				print "Tee_goal:", self.Tee_goal[0:3,3]
+				# print "Tee_goal:", self.Tee_goal[0:3,3]
 				tpose = [0.24770613, 0.00644665, -0.00000013]
 				tpose = [0.1, 0.22650042, 0.00998334]
 
@@ -247,7 +247,8 @@ class IKSolver:
 				except openrave_exception, e:
 					print e
 			else:
-				print "The same invalid Tee", self.Tee_goal
+				# print "The same invalid Tee", self.Tee_goal
+				pass
 				
 		else:
 			print "Unknown ee_type"
