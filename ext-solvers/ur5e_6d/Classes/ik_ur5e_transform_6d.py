@@ -64,9 +64,10 @@ class IK_UR5ETRANSFORM6D:
                 raise AssertionError("No solution found")
             else:
                 if limitted:
-                    self.apply_joint_limits(shoulder_pan=[0, pi])
-                    # print "ik results:", self.joint_configs
-                    print "joint configs after:", self.joint_configs
+                    print "sols before:", self.joint_configs.shape
+                    self.apply_joint_limits(shoulder_pan=[-pi/4, 3*pi/4], shoulder_lift=[-pi, -pi/6])
+                    print "sols after:", self.joint_configs.shape
+                    # print "joint configs after:", self.joint_configs
                     self.n_solutions = len(self.joint_configs)
                     print "n_solutions after:", self.n_solutions
                 return self.joint_configs
@@ -74,10 +75,11 @@ class IK_UR5ETRANSFORM6D:
             print e
     
 
-    def choose_closest_soln(self, current_angles, restricted=False):
+    def choose_closest_soln(self, current_angles, restricted=True):
         diff = []
         for joint_config in self.joint_configs:
-            diff.append(mse(joint_config, current_angles))
+            # diff.append(mse(joint_config, current_angles))
+            diff.append(mse(joint_config, current_angles, sample_weight=[1.0, 0.01, 1.0, 0.01, 1.0, 0.01]))
         closest_soln_index = diff.index(min(diff))
         self.closest_soln = self.joint_configs[closest_soln_index]
         print "closest:", self.closest_soln
@@ -98,7 +100,6 @@ class IK_UR5ETRANSFORM6D:
             if not self.n_solutions > 1:
                 changed = False
                 raise AssertionError("All solutions removed")
-                sys.exit()
             else:
                 diff_base = np.ones(6)
                 for i in range(6):
@@ -124,31 +125,31 @@ class IK_UR5ETRANSFORM6D:
     def apply_joint_limits(self, **kwargs):
         ''' Manually apply joint limits
             Call this function like: iksolverwhatever.apply_joint_limits(shoulder_pan=[theta_min, theta_max], shoulder_lift=angle_y, wrist_3=angle_z)'''
-        # for joint, theta in kwargs.items():
-        #     joint_int = IK_UR5ETRANSFORM6D.joint_names_to_numbers(joint)
-        #     # print "joint:", joint, "theta:", theta
-        #     remove_index_list = []
-        #     for sol_index in range(self.n_solutions):
-        #         if not ((self.joint_configs[sol_index, joint_int] > theta[0]) and (self.joint_configs[sol_index, joint_int] < theta[1])):
-        #             remove_index_list.append(sol_index)
-
         remove_index_list = []
-        for sol_index in range(self.n_solutions):
-            if not ((self.joint_configs[sol_index, 0] > 0.0) and (self.joint_configs[sol_index, 0] < 3*pi/4)):
-                remove_index_list.append(sol_index)
+        for joint, theta in kwargs.items():
+            joint_int = IK_UR5ETRANSFORM6D.joint_names_to_numbers(joint)
+            # print "joint:", joint, "theta:", theta
+            for sol_index in range(self.n_solutions):
+                if not ((self.joint_configs[sol_index, joint_int] > theta[0]) and (self.joint_configs[sol_index, joint_int] < theta[1])):
+                    remove_index_list.append(sol_index)
+
+        # remove_index_list = []
+        # for sol_index in range(self.n_solutions):
+        #     if not ((self.joint_configs[sol_index, 0] > 0.0) and (self.joint_configs[sol_index, 0] < 3*pi/4)):
+        #         remove_index_list.append(sol_index)
 
         print "n of sols before:", len(self.joint_configs/self.n_joints)
+        remove_index_list = list(set(remove_index_list))
         remove_index_list.sort(reverse=True)  
         print "to be removed index:", remove_index_list
         for r in range(len(remove_index_list)):
             # print "shape:", self.joint_configs.shape
             # print "to be removed:", remove_index_list[r]
-            print "n of sols in for:", len(self.joint_configs/self.n_joints)
             # print "joints:", self.joint_configs[remove_index_list[r]]
             # dummy = raw_input()
-            # print "Removed:", self.joint_configs[remove_index_list[r], 0], "for limits:", theta
+            print "Removed:", self.joint_configs[remove_index_list[r], 0], "for joint:", joint, joint_int, "limits:", theta
             self.joint_configs = np.delete(self.joint_configs, remove_index_list[r], 0)
-            print "r:", r
+            # print "r:", r
                 
 
     @staticmethod
