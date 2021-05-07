@@ -41,7 +41,7 @@ class IK_UR5ETRANSFORM6D:
         return np.asarray(self.ee_coord)
 
     
-    def calc_inverse_kin(self, ee_coord):
+    def calc_inverse_kin(self, ee_coord, limitted=True):
         '''
         Given coordinates ee as a list, return all possible joint angles
         @params: ee_coord=(3,4) np.ndarray
@@ -63,18 +63,23 @@ class IK_UR5ETRANSFORM6D:
             if not self.n_solutions > 0:
                 raise AssertionError("No solution found")
             else:
+                if limitted:
+                    self.apply_joint_limits(shoulder_pan=[0, pi])
+                    print "ik results:", self.joint_configs
+                    self.n_solutions = int(len(self.joint_configs)/self.n_joints)
+                    print "n_solutions:", self.n_solutions
                 return self.joint_configs
         except AssertionError as e:
             print e
     
 
-    def choose_closest_soln(self, current_angles, restricted=True):
+    def choose_closest_soln(self, current_angles, restricted=False):
         diff = []
         for joint_config in self.joint_configs:
             diff.append(mse(joint_config, current_angles))
         closest_soln_index = diff.index(min(diff))
         self.closest_soln = self.joint_configs[closest_soln_index]
-        print "closest:", self.closest_soln
+        print "closestttt:", self.closest_soln
         print "current:", current_angles
         if restricted:
             changed = self.eliminate_jumps(current_angles, self.closest_soln, closest_soln_index)
@@ -94,8 +99,8 @@ class IK_UR5ETRANSFORM6D:
                 raise AssertionError("All solutions removed")
                 sys.exit()
             else:
-                diff_base = np.ones(3)
-                for i in range(3):
+                diff_base = np.ones(6)
+                for i in range(6):
                     diff_base[i] = abs(current_angles[i]-closest_soln[i])
                     diff_base[i] = True if diff_base[i] > 0.707 else False
                 # diff_base = current_angles[1]-closest_soln[1]
@@ -115,18 +120,28 @@ class IK_UR5ETRANSFORM6D:
 
 
     
-    def apply_joint_limits(self, current_angles, **kwargs):
-        ''' Manually apply joint limits LATER
-            Call this function like: iksolverwhatever.apply_joint_limits(shoulder_pan=angle_x, shoulder_lift=angle_y, wrist_3=angle_z)'''
+    def apply_joint_limits(self, **kwargs):
+        ''' Manually apply joint limits
+            Call this function like: iksolverwhatever.apply_joint_limits(shoulder_pan=[theta_min, theta_max], shoulder_lift=angle_y, wrist_3=angle_z)'''
         for joint, theta in kwargs.items():
             joint_int = IK_UR5ETRANSFORM6D.joint_names_to_numbers(joint)
-            if joint_int == 0:
-                pass
-            elif joint_int == 1:
-                pass
-            else:
-                sys.exit("Unknown joint name or limit")
+            # print "joint:", joint, "theta:", theta
+            remove_index_list = []
+            for sol_index in range(self.n_solutions):
+                if not ((self.joint_configs[sol_index, joint_int] > theta[0]) and (self.joint_configs[sol_index, joint_int] < theta[1])):
+                    remove_index_list.append(sol_index)
 
+            remove_index_list.sort(reverse=True)  
+            print "to be removed index:", remove_index_list
+            for r in range(len(remove_index_list)):
+                print "shape:", self.joint_configs.shape
+                print "to be removed:", remove_index_list[r]
+                print self.joint_configs
+                print "joints:", self.joint_configs[remove_index_list[r]]
+                # dummy = raw_input()
+                print "Removed:", self.joint_configs[remove_index_list[r], joint_int], "for limits:", theta
+                self.joint_configs = np.delete(self.joint_configs, remove_index_list[r], 0)
+                
 
     @staticmethod
     def joint_names_to_numbers(argument): 
