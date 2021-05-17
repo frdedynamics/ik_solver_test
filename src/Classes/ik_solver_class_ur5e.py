@@ -77,7 +77,9 @@ class IKSolver:
 
 
 		# Initial poses
-		home = [pi/2, -pi/2, pi/2, pi, -pi/2, 0.0]
+		home = [0.0, -pi/2, pi/2, pi, -pi/2, 0.0]
+		# home = [pi/2, -pi/2, pi/2, pi, -pi/2, 0.0]
+
 		# self.robot.SetDOFValues(home) 
 		# dummy_input = raw_input("Next?")
 		# home = [pi/2, -pi/2., pi/2, 0.0,0.1,0.]
