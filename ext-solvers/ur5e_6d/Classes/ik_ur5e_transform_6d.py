@@ -64,9 +64,9 @@ class IK_UR5ETRANSFORM6D:
                 raise AssertionError("No solution found")
             else:
                 if limitted:
-                    print "sols before:", self.joint_configs.shape
-                    self.apply_joint_limits(shoulder_pan=[-pi/4, 3*pi/4], shoulder_lift=[-pi, -pi/6])
-                    print "sols after:", self.joint_configs.shape
+                    print "sols before limit:", self.joint_configs.shape
+                    self.apply_joint_limits(shoulder_pan=[-pi/4, pi/4], shoulder_lift=[-3*pi/4, -pi/4], wrist_2=[0.0, pi/2])
+                    print "sols after limit:", self.joint_configs.shape
                     # print "joint configs after:", self.joint_configs
                     self.n_solutions = len(self.joint_configs)
                     print "n_solutions after:", self.n_solutions
@@ -75,11 +75,11 @@ class IK_UR5ETRANSFORM6D:
             print e
     
 
-    def choose_closest_soln(self, current_angles, restricted=True):
+    def choose_closest_soln(self, current_angles, restricted=False):
         diff = []
         for joint_config in self.joint_configs:
-            # diff.append(mse(joint_config, current_angles))
-            diff.append(mse(joint_config, current_angles, sample_weight=[1.0, 0.01, 1.0, 0.01, 1.0, 0.01]))
+            diff.append(mse(joint_config, current_angles))
+            # diff.append(mse(joint_config, current_angles, sample_weight=[10.0, 0.01, 10.0, 0.01, 10.0, 0.01]))
         closest_soln_index = diff.index(min(diff))
         self.closest_soln = self.joint_configs[closest_soln_index]
         print "closest:", self.closest_soln
