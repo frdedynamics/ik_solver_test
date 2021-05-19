@@ -11,6 +11,7 @@ Subscribes T_goal {Pose()}, publishes joint angles {JointState()}
 import sys, os
 import rospy
 from math import sqrt, pi
+from math import radians as d2r
 import numpy as np
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import Vector3
@@ -77,8 +78,11 @@ class IKSolver:
 
 
 		# Initial poses
-		home = [0.0, -pi/2, pi/2, pi, -pi/2, 0.0]
+		# home = [0.0, -pi/2, pi/2, pi, -pi/2, 0.0]
 		# home = [pi/2, -pi/2, pi/2, pi, -pi/2, 0.0]
+		home = [d2r(-139.29), d2r(-39.49), d2r(117.12), d2r(109.50), d2r(-80.88), d2r(92.66)]
+		# place_appr = [d2r(-15.85), d2r(-51.86), d2r(67.72), d2r(165.28), d2r(-88.14), d2r(-88.43)]
+		# place = [d2r(-15.65), d2r(-46.40), d2r(74.72), d2r(152.81), d2r(-88.41), d2r(-88.41)]
 
 		# self.robot.SetDOFValues(home) 
 		# dummy_input = raw_input("Next?")

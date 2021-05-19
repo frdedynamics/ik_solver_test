@@ -7,6 +7,7 @@ Created using ikfastpy:
 import os, sys
 import numpy as np
 from math import pi
+from math import radians as d2r
 from sklearn.metrics import mean_squared_error as mse
 
 sys.path.append("/home/gizem/catkin_ws/src/ik_solver_test/ext-solvers/ur5e_6d")
@@ -65,7 +66,8 @@ class IK_UR5ETRANSFORM6D:
             else:
                 if limitted:
                     print "sols before limit:", self.joint_configs.shape
-                    self.apply_joint_limits(shoulder_pan=[-pi/4, pi/4], shoulder_lift=[-3*pi/4, -pi/4], wrist_2=[-pi, -pi/2])
+                    # self.apply_joint_limits(shoulder_pan=[-pi/4, pi/4], shoulder_lift=[-3*pi/4, -pi/4], wrist_2=[-pi, -pi/2])
+                    self.apply_joint_limits(shoulder_lift=[d2r(-45.0), 0.5])
                     print "sols after limit:", self.joint_configs.shape
                     # print "joint configs after:", self.joint_configs
                     self.n_solutions = len(self.joint_configs)
