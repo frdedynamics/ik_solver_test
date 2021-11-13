@@ -83,6 +83,9 @@ class IKSolver:
 		home = [-1.61718929, -0.90831965,  1.47090709, -0.43931657,  1.48942041, -1.56104302]
 		# place_away = [d2r(-163.06), d2r(-38.54), d2r(91.50), d2r(-17.70), d2r(12.25), d2r(-123.61)]
 		# place = [d2r(-150.51), d2r(-35.15), d2r(83.97), d2r(-30.97), d2r(23.58), d2r(-105.38)]
+		 
+		# release =  [d2r(-68.98), d2r(-48.91), d2r(59.04), d2r(-2.67), d2r(108.76), d2r(-86.52)]
+		# place = [d2r(-150.51), d2r(-35.15), d2r(83.97), d2r(-30.97), d2r(23.58), d2r(-105.38)]
 		
 		# self.robot.SetDOFValues(home) 
 		# dummy_input = raw_input("Next?")
@@ -105,10 +108,52 @@ class IKSolver:
 		# self.robot.SetDOFValues(home) 
 		# dummy_input = raw_input("Next?")
 		# sys.exit(0)
+
+		robot_init_joints = [d2r(-92.66), d2r(-52.04), d2r(84.27), d2r(-25.17), d2r(85.33), d2r(-89.44)]
+		self.robot.SetDOFValues(robot_init_joints) 
+		print("robot_init")
+		Tee = np.asarray(self.manip.GetEndEffectorTransform())
+		Tee_pose = DHmatrices.htm_to_pose(Tee)
+		print Tee_pose
+
+		release_prev_joints = [d2r(-156.66), d2r(-40.38), d2r(58.48), d2r(-16.06), d2r(38.70), d2r(-94.83)]
+		self.robot.SetDOFValues(release_prev_joints) 
+		print("release_prev_joints")
+		Tee = np.asarray(self.manip.GetEndEffectorTransform())
+		Tee_pose = DHmatrices.htm_to_pose(Tee)
+		print Tee_pose
+
+		release_approach_joints = [d2r(-175.82), d2r(-44.7), d2r(85.04), d2r(-36.80), d2r(19.64), d2r(-96.58)]
+		self.robot.SetDOFValues(release_approach_joints) 
+		print("release_approach_joints")
+		Tee = np.asarray(self.manip.GetEndEffectorTransform())
+		Tee_pose = DHmatrices.htm_to_pose(Tee)
+		print Tee_pose
+
+		release_joints = [d2r(-156.66), d2r(-33.67), d2r(62.73), d2r(-27.07), d2r(38.72), d2r(-94.81)]
+		self.robot.SetDOFValues(release_joints) 
+		print("release_joints")
+		Tee = np.asarray(self.manip.GetEndEffectorTransform())
+		Tee_pose = DHmatrices.htm_to_pose(Tee)
+		print Tee_pose
+
+		home_approach_joints = [d2r(-175.82), d2r(-58.56), d2r(73.26), d2r(-11.08), d2r(19.57), d2r(-96.67)]
+		self.robot.SetDOFValues(home_approach_joints) 
+		print("home_approach_joints")
+		Tee = np.asarray(self.manip.GetEndEffectorTransform())
+		Tee_pose = DHmatrices.htm_to_pose(Tee)
+		print Tee_pose
+
+		sys.exit()
+
+
 		self.robot.SetDOFValues(home) 
 		# dummy_input = raw_input("Next?")
 		Tee_home = np.asarray(self.manip.GetEndEffectorTransform())
 		print "Tee_home:", self.manip.GetEndEffectorTransform() # get end effector
+		# Tee_pose = DHmatrices.htm_to_pose(Tee_home)
+		# print Tee_pose
+		# sys.exit()
 
 		self.Twrist = self.robot.GetLink('wrist_1_link').GetTransform()
 		print self.Twrist  ## don't update this. Initial is our pivot point. Otherwise it changes with wrist_1 rotation
