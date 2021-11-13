@@ -109,42 +109,42 @@ class IKSolver:
 		# dummy_input = raw_input("Next?")
 		# sys.exit(0)
 
-		robot_init_joints = [d2r(-92.66), d2r(-52.04), d2r(84.27), d2r(-25.17), d2r(85.33), d2r(-89.44)]
-		self.robot.SetDOFValues(robot_init_joints) 
-		print("robot_init")
-		Tee = np.asarray(self.manip.GetEndEffectorTransform())
-		Tee_pose = DHmatrices.htm_to_pose(Tee)
-		print Tee_pose
+		# robot_init_joints = [d2r(-92.66), d2r(-52.04), d2r(84.27), d2r(-25.17), d2r(85.33), d2r(-89.44)]
+		# self.robot.SetDOFValues(robot_init_joints) 
+		# print("robot_init")
+		# Tee = np.asarray(self.manip.GetEndEffectorTransform())
+		# Tee_pose = DHmatrices.htm_to_pose(Tee)
+		# print Tee_pose
 
-		release_prev_joints = [d2r(-156.66), d2r(-40.38), d2r(58.48), d2r(-16.06), d2r(38.70), d2r(-94.83)]
-		self.robot.SetDOFValues(release_prev_joints) 
-		print("release_prev_joints")
-		Tee = np.asarray(self.manip.GetEndEffectorTransform())
-		Tee_pose = DHmatrices.htm_to_pose(Tee)
-		print Tee_pose
+		# release_prev_joints = [d2r(-156.66), d2r(-40.38), d2r(58.48), d2r(-16.06), d2r(38.70), d2r(-94.83)]
+		# self.robot.SetDOFValues(release_prev_joints) 
+		# print("release_prev_joints")
+		# Tee = np.asarray(self.manip.GetEndEffectorTransform())
+		# Tee_pose = DHmatrices.htm_to_pose(Tee)
+		# print Tee_pose
 
-		release_approach_joints = [d2r(-175.82), d2r(-44.7), d2r(85.04), d2r(-36.80), d2r(19.64), d2r(-96.58)]
-		self.robot.SetDOFValues(release_approach_joints) 
-		print("release_approach_joints")
-		Tee = np.asarray(self.manip.GetEndEffectorTransform())
-		Tee_pose = DHmatrices.htm_to_pose(Tee)
-		print Tee_pose
+		# release_approach_joints = [d2r(-175.82), d2r(-44.7), d2r(85.04), d2r(-36.80), d2r(19.64), d2r(-96.58)]
+		# self.robot.SetDOFValues(release_approach_joints) 
+		# print("release_approach_joints")
+		# Tee = np.asarray(self.manip.GetEndEffectorTransform())
+		# Tee_pose = DHmatrices.htm_to_pose(Tee)
+		# print Tee_pose
 
-		release_joints = [d2r(-156.66), d2r(-33.67), d2r(62.73), d2r(-27.07), d2r(38.72), d2r(-94.81)]
-		self.robot.SetDOFValues(release_joints) 
-		print("release_joints")
-		Tee = np.asarray(self.manip.GetEndEffectorTransform())
-		Tee_pose = DHmatrices.htm_to_pose(Tee)
-		print Tee_pose
+		# release_joints = [d2r(-156.66), d2r(-33.67), d2r(62.73), d2r(-27.07), d2r(38.72), d2r(-94.81)]
+		# self.robot.SetDOFValues(release_joints) 
+		# print("release_joints")
+		# Tee = np.asarray(self.manip.GetEndEffectorTransform())
+		# Tee_pose = DHmatrices.htm_to_pose(Tee)
+		# print Tee_pose
 
-		home_approach_joints = [d2r(-175.82), d2r(-58.56), d2r(73.26), d2r(-11.08), d2r(19.57), d2r(-96.67)]
-		self.robot.SetDOFValues(home_approach_joints) 
-		print("home_approach_joints")
-		Tee = np.asarray(self.manip.GetEndEffectorTransform())
-		Tee_pose = DHmatrices.htm_to_pose(Tee)
-		print Tee_pose
+		# home_approach_joints = [d2r(-95.72), d2r(-85.83), d2r(95.93), d2r(-3.86), d2r(95.29), d2r(-89.49)]
+		# self.robot.SetDOFValues(home_approach_joints) 
+		# print("home_approach_joints")
+		# Tee = np.asarray(self.manip.GetEndEffectorTransform())
+		# Tee_pose = DHmatrices.htm_to_pose(Tee)
+		# print Tee_pose
 
-		sys.exit()
+		# sys.exit()
 
 
 		self.robot.SetDOFValues(home) 
